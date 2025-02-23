@@ -46,9 +46,10 @@ import Login from "./components/Login";
 import Private from "./components/Private";
 import Contact from "./components/Contact"; // Import the Contact component
 import Photos from "./components/Photos"; // Import the Photos component
-
+import { AuthProvider } from "./context/AuthContext"; // Import AuthProvider
 function App() {
   return (
+    <AuthProvider> {/* Wrap the entire app with AuthProvider */}
     <Router>
       <Navbar />
       <Routes>
@@ -60,6 +61,8 @@ function App() {
         <Route path="/photos" element={<Photos />} /> {/* Add the Photos route */}
       </Routes>
     </Router>
+    </AuthProvider>
+
   );
 }
 
