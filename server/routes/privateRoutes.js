@@ -9,12 +9,19 @@ const { User } = require("../models");
 
 const router = express.Router();
 
-const STORAGE_ROOT = path.join(
-  __dirname,
-  "..",
-  "storage",
-  "private-photos"
-);
+const STORAGE_ROOT =
+  process.env.PRIVATE_PHOTO_STORAGE_ROOT ||
+  (process.env.RAILWAY_VOLUME_MOUNT_PATH
+    ? path.join(
+        process.env.RAILWAY_VOLUME_MOUNT_PATH,
+        "private-photos"
+      )
+    : path.join(
+        __dirname,
+        "..",
+        "storage",
+        "private-photos"
+      ));
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
