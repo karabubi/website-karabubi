@@ -1,3 +1,4 @@
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     // Step 1: Create the Users table
@@ -48,4 +49,4 @@ module.exports = {
     // Step 2: Drop the Users table
     await queryInterface.dropTable('Users');
   }
-};
+ };

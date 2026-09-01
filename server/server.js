@@ -1,89 +1,75 @@
-// const express = require("express");
-// const cors = require("cors");
-// const db = require("./db");
-// const authRoutes = require("./routes/authRoutes");
-// const privateRoutes = require("./routes/privateRoutes");
 
-// const app = express();
-// const PORT = process.env.PORT || 5001;
-
-// // Middleware
-// app.use(cors());
-// app.use(express.json());
-
-// // Database connection
-// db.authenticate()
-//   .then(() => {
-//     console.log("Database connected...");
-//     return db.sync({ force: false });
-//   })
-//   .then(() => console.log("Database synchronized..."))
-//   .catch((err) => console.error("Database connection error:", err));
-
-// // Routes
-// app.use("/api/auth", authRoutes);
-// app.use("/api/private", privateRoutes);
-
-// // Start server
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-// const express = require("express");
-// const cors = require("cors");
-// const db = require("./db");
-// const authRoutes = require("./routes/authRoutes"); // Correct import
-// const privateRoutes = require("./routes/privateRoutes");
-
-// const app = express();
-// const PORT = process.env.PORT || 5001;
-
-// // Middleware
-// app.use(cors());
-// app.use(express.json());
-
-// // Database connection
-// db.authenticate()
-//   .then(() => {
-//     console.log("Database connected...");
-//     return db.sync({ force: false });
-//   })
-//   .then(() => console.log("Database synchronized..."))
-//   .catch((err) => console.error("Database connection error:", err));
-
-// // Routes
-// app.use("/api/auth", authRoutes); // Correct usage
-// app.use("/api/private", privateRoutes);
-
-// // Start server
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-
-const express = require("express");
-const cors = require("cors");
-const db = require("./db");
-const authRoutes = require("./routes/authRoutes");
-const privateRoutes = require("./routes/privateRoutes");
+// Users/salehalkarabubi/works/project/website-karabubi/server/server.js
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const morgan = require('morgan');
+const db = require('./db');
+const authRoutes = require('./routes/authRoutes');
+const privateRoutes = require('./routes/privateRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true,
+}));
+app.use(morgan('dev'));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Database connection
-db.authenticate()
+// Statische Dateien bereitstellen
+app.use('/static', express.static(path.join(__dirname, 'public')));
+
+// Datenbankverbindung mit Retry-Logik
+const connectDatabase = async (retries = 5, interval = 5000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await db.authenticate();
+      console.log('✅ Datenbank verbunden...');
+      await db.sync({ force: false });
+      console.log('✅ Datenbank synchronisiert...');
+      return;
+    } catch (error) {
+      console.error(`❌ Datenbankverbindung fehlgeschlagen (Versuch ${i + 1}):`, error.message);
+      if (i === retries - 1) throw error;
+      await new Promise(res => setTimeout(res, interval));
+    }
+  }
+};
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'website-karabubi-api'
+  });
+});
+
+// Routen
+app.use('/api/auth', authRoutes);
+app.use('/api/private', privateRoutes);
+
+// Fehlerbehandlung
+app.use((err, req, res, next) => {
+  console.error('❌ Serverfehler:', err);
+  res.status(500).json({
+    error: process.env.NODE_ENV === 'production' ? 'Interner Serverfehler' : err.message,
+  });
+});
+
+// Server starten
+connectDatabase()
   .then(() => {
-    console.log("Database connected...");
-    return db.sync({ force: false }); // Sync models with the database
+    app.listen(PORT, () => {
+      console.log(`🚀 Server läuft auf Port ${PORT}`);
+      console.log(`🌍 Umgebung: ${process.env.NODE_ENV || 'development'}`);
+    });
   })
-  .then(() => console.log("Database synchronized..."))
-  .catch((err) => console.error("Database connection error:", err));
-
-// Routes
-app.use("/api/auth", authRoutes); // Authentication routes
-app.use("/api/private", privateRoutes); // Protected routes
-
-// Start server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  .catch(error => {
+    console.error('❌ Server konnte nicht gestartet werden:', error);
+    process.exit(1);
+  });

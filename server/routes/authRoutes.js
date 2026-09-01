@@ -1,114 +1,247 @@
-
-// const express = require("express");
-// const router = express.Router();
-// const { User } = require("../models/User.js");
-// const bcrypt = require("bcrypt");
-// const jwt = require("jsonwebtoken");
-// const sendConfirmationEmail = require("../utils/email.js");
-// require("dotenv").config();
-// console.log(User); // Should log the User model definition
-// // Register User
-// router.post("/register", async (req, res) => {
-//   const { name, username, password, email } = req.body;
-
-//   try {
-//     // Check if the email or username already exists
-//     const existingUser = await User.findOne({ where: { email } });
-//     if (existingUser) return res.status(400).json({ error: "Email already exists" });
-
-//     // Hash the password
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     // Create the user
-//     const user = await User.create({ name, username, email, password: hashedPassword });
-
-//     // Send confirmation email
-//     sendConfirmationEmail(email, username, password);
-
-//     res.status(201).json({ success: true, message: "User registered successfully" });
-//   } catch (error) {
-//     console.error("Registration error:", error);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// });
-
-// // Login User
-// router.post("/login", async (req, res) => {
-//   const { username, password } = req.body;
-
-//   try {
-//     // Find the user by username
-//     const user = await User.findOne({ where: { username } });
-//     if (!user) return res.status(401).json({ error: "Invalid credentials" });
-
-//     // Validate the password
-//     const isValidPassword = await bcrypt.compare(password, user.password);
-//     if (!isValidPassword) return res.status(401).json({ error: "Invalid credentials" });
-
-//     // Generate a JWT token
-//     const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, {
-//       expiresIn: "1h",
-//     });
-
-//     res.status(200).json({ success: true, token });
-//   } catch (error) {
-//     console.error("Login error:", error);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// });
-
-// module.exports = router;
-
 const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { Op } = require("sequelize");
+
+const { User } = require("../models");
+const authMiddleware = require("../middleware/authMiddleware");
+
 const router = express.Router();
-const admin = require("firebase-admin");
-const { User } = require("../models/User");
 
-// Register User
+const createToken = (user) => {
+  return jwt.sign(
+    {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "2h",
+    }
+  );
+};
+
+const publicUser = (user) => ({
+  id: user.id,
+  name: user.name,
+  username: user.username,
+  email: user.email,
+  isVerified: user.isVerified,
+});
+
 router.post("/register", async (req, res) => {
-  const { name, username, email, password } = req.body;
-
   try {
-    // Create user in Firebase
-    const userRecord = await admin.auth().createUser({
-      email,
-      password,
-      displayName: name,
-    });
-
-    // Save user in PostgreSQL
-    await User.create({
-      firebase_uid: userRecord.uid,
+    let {
       name,
       username,
       email,
-    });
+      password,
+    } = req.body;
 
-    res.status(201).json({ success: true, message: "User registered successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    name = String(name || "").trim();
+    username = String(username || "").trim().toLowerCase();
+    email = String(email || "")
+      .trim()
+      .toLowerCase();
 
-// Login User
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+    password = String(password || "");
 
-  try {
-    // Verify user credentials using Firebase
-    const userRecord = await admin.auth().getUserByEmail(email);
-
-    // Find user in PostgreSQL
-    const user = await User.findOne({ where: { firebase_uid: userRecord.uid } });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found in database" });
+    if (
+      !name ||
+      !username ||
+      !email ||
+      !password
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: "All fields are required.",
+      });
     }
 
-    res.status(200).json({ success: true, user });
+    if (name.length < 2) {
+      return res.status(400).json({
+        success: false,
+        error: "Name must contain at least 2 characters.",
+      });
+    }
+
+    if (username.length < 3) {
+      return res.status(400).json({
+        success: false,
+        error: "Username must contain at least 3 characters.",
+      });
+    }
+
+    const emailPattern =
+      /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+      return res.status(400).json({
+        success: false,
+        error: "Please enter a valid email address.",
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        error: "Password must contain at least 8 characters.",
+      });
+    }
+
+    const existingUser = await User.findOne({
+      where: {
+        [Op.or]: [
+          { email },
+          { username },
+        ],
+      },
+    });
+
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return res.status(409).json({
+          success: false,
+          error: "An account with this email already exists.",
+        });
+      }
+
+      return res.status(409).json({
+        success: false,
+        error: "This username is already taken.",
+      });
+    }
+
+    const hashedPassword =
+      await bcrypt.hash(password, 12);
+
+    const user = await User.create({
+      name,
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    const token = createToken(user);
+
+    return res.status(201).json({
+      success: true,
+      message: "Account created successfully.",
+      token,
+      user: publicUser(user),
+    });
   } catch (error) {
-    res.status(401).json({ error: "Invalid credentials" });
+    console.error("Registration error:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: "Unable to create account.",
+    });
   }
 });
+
+router.post("/login", async (req, res) => {
+  try {
+    const identifier = String(
+      req.body.identifier ||
+      req.body.username ||
+      req.body.email ||
+      ""
+    )
+      .trim()
+      .toLowerCase();
+
+    const password = String(
+      req.body.password || ""
+    );
+
+    if (!identifier || !password) {
+      return res.status(400).json({
+        success: false,
+        error: "Username/email and password are required.",
+      });
+    }
+
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [
+          {
+            username: {
+              [Op.iLike]: identifier,
+            },
+          },
+          { email: identifier },
+        ],
+      },
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid username/email or password.",
+      });
+    }
+
+    const passwordValid =
+      await bcrypt.compare(
+        password,
+        user.password
+      );
+
+    if (!passwordValid) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid username/email or password.",
+      });
+    }
+
+    const token = createToken(user);
+
+    return res.json({
+      success: true,
+      token,
+      user: publicUser(user),
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: "Unable to sign in.",
+    });
+  }
+});
+
+router.get(
+  "/me",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const user = await User.findByPk(
+        req.user.id
+      );
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: "User not found.",
+        });
+      }
+
+      return res.json({
+        success: true,
+        user: publicUser(user),
+      });
+    } catch (error) {
+      console.error("Profile error:", error);
+
+      return res.status(500).json({
+        success: false,
+        error: "Unable to load user profile.",
+      });
+    }
+  }
+);
 
 module.exports = router;
