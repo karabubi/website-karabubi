@@ -74,7 +74,7 @@ router.post("/register", async (req, res) => {
     }
 
     const emailPattern =
-      /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailPattern.test(email)) {
       return res.status(400).json({
