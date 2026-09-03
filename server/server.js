@@ -62,14 +62,11 @@ app.use((err, req, res, next) => {
 });
 
 // Server starten
-connectDatabase()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`🚀 Server läuft auf Port ${PORT}`);
-      console.log(`🌍 Umgebung: ${process.env.NODE_ENV || 'development'}`);
-    });
-  })
-  .catch(error => {
-    console.error('❌ Server konnte nicht gestartet werden:', error);
-    process.exit(1);
-  });
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server läuft auf Port ${PORT}`);
+  console.log(`🌍 Umgebung: ${process.env.NODE_ENV || "development"}`);
+});
+
+connectDatabase().catch((error) => {
+  console.error("❌ Datenbankverbindung fehlgeschlagen:", error.message);
+});
