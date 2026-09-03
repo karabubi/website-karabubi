@@ -73,10 +73,15 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    const emailPattern =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const atIndex = email.indexOf("@");
+    const lastDotIndex = email.lastIndexOf(".");
 
-    if (!emailPattern.test(email)) {
+    const isValidEmail =
+      atIndex > 0 &&
+      lastDotIndex > atIndex + 1 &&
+      lastDotIndex < email.length - 1;
+
+    if (!isValidEmail) {
       return res.status(400).json({
         success: false,
         error: "Please enter a valid email address.",
