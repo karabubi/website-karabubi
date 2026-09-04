@@ -1,5 +1,5 @@
 import React from "react";
-import salehPhoto from "../assets/saleh.jpg";
+import salehPhoto from "../assets/saleh-about.jpg";
 import { useLanguage } from "../context/LanguageContext";
 
 function DocumentIcon({ type }) {
