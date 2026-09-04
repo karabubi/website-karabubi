@@ -331,7 +331,7 @@ router.get(
       getUserDirectory(req.user.id);
 
     const filePath =
-      path.join(directory, filename);
+      path.resolve(directory, filename);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({
@@ -347,7 +347,23 @@ router.get(
 
     res.type(getMimeType(filename));
 
-    return res.sendFile(filePath);
+    return res.sendFile(filePath, (error) => {
+      if (error) {
+        console.error(
+          "View private photo error:",
+          error
+        );
+
+        if (!res.headersSent) {
+          return res.status(
+            error.statusCode || 500
+          ).json({
+            success: false,
+            error: "Unable to load photo.",
+          });
+        }
+      }
+    });
   }
 );
 
