@@ -45,7 +45,8 @@ const connectDatabase = async (retries = 5, interval = 5000) => {
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
-    service: 'website-karabubi-api'
+    service: 'website-karabubi-api',
+    deploymentFingerprint: 'auth-email-debug-20260904-01'
   });
 });
 
