@@ -34,6 +34,8 @@ const en = {
     updated: 'Updated',
     forks: 'Forks',
     viewRepository: 'View repository',
+    liveDemo: 'Live demo',
+    stars: 'Stars',
     defaultDescription: 'Public software-development project. Open the repository to explore the source code, documentation and implementation.',
   },
 

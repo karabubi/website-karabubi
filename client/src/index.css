@@ -3868,3 +3868,102 @@
 html[dir="rtl"] .site-nav-links {
   direction: rtl;
 }
+
+/* =====================================================
+   Phase 27B - Project repository / live demo actions
+   ===================================================== */
+
+.project-card-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.project-card-actions .project-repository-link,
+.project-live-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 9px 13px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.project-card-actions .project-repository-link {
+  flex: 1 1 auto;
+}
+
+.project-live-link {
+  flex: 0 1 auto;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.5);
+  color: #e2e8f0;
+}
+
+.project-live-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(148, 163, 184, 0.55);
+  background: rgba(30, 41, 59, 0.78);
+  color: #ffffff;
+}
+
+.projects-action-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+}
+
+.project-card-actions a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* Arabic / RTL */
+html[dir="rtl"] .project-card-actions {
+  direction: rtl;
+}
+
+html[dir="rtl"] .project-card-actions a {
+  flex-direction: row;
+}
+
+/* Tablet / phone */
+@media (max-width: 640px) {
+  .project-modern-footer {
+    align-items: stretch;
+  }
+
+  .project-card-actions {
+    width: 100%;
+  }
+
+  .project-card-actions .project-repository-link,
+  .project-live-link {
+    flex: 1 1 150px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 420px) {
+  .project-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .project-card-actions .project-repository-link,
+  .project-live-link {
+    width: 100%;
+    flex: 0 0 auto;
+  }
+}

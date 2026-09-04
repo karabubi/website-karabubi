@@ -34,6 +34,8 @@ const de = {
     updated: 'Aktualisiert',
     forks: 'Forks',
     viewRepository: 'Repository ansehen',
+    liveDemo: 'Live-Demo',
+    stars: 'Sterne',
     defaultDescription: 'Öffentliches Softwareentwicklungsprojekt. Öffnen Sie das Repository, um Quellcode, Dokumentation und Implementierung anzusehen.',
   },
 

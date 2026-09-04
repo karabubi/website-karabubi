@@ -20,6 +20,44 @@ const projectDefinitions = {
     "Personal portfolio project for presenting development work, technical skills and professional information.",
 };
 
+function getLiveDemoUrl(repo) {
+  const value = String(repo?.homepage || "").trim();
+
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const url = new URL(value);
+
+    if (
+      url.protocol !== "https:" &&
+      url.protocol !== "http:"
+    ) {
+      return null;
+    }
+
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+function ExternalLinkIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="projects-action-icon"
+    >
+      <path
+        fill="currentColor"
+        d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3Zm5 16H5V5h6V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6h-2v6Z"
+      />
+    </svg>
+  );
+}
+
 function GitHubIcon() {
   return (
     <svg
@@ -313,7 +351,7 @@ function Photos() {
                     <div className="project-modern-footer">
                       <div className="project-modern-stats">
                         <span>
-                          ☆ {repo.stargazers_count}
+                          ☆ {repo.stargazers_count} {t.projects.stars}
                         </span>
 
                         <span>
@@ -321,15 +359,29 @@ function Photos() {
                         </span>
                       </div>
 
-                      <a
-                        href={repo.html_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="project-repository-link"
-                      >
-                        {t.projects.viewRepository}
-                        <span aria-hidden="true">↗</span>
-                      </a>
+                      <div className="project-card-actions">
+                        <a
+                          href={repo.html_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="project-repository-link"
+                        >
+                          <GitHubIcon />
+                          {t.projects.viewRepository}
+                        </a>
+
+                        {getLiveDemoUrl(repo) && (
+                          <a
+                            href={getLiveDemoUrl(repo)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="project-live-link"
+                          >
+                            <ExternalLinkIcon />
+                            {t.projects.liveDemo}
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </article>
                 ))}
