@@ -16,6 +16,7 @@ import {
 import {
   useAuth,
 } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -136,6 +137,8 @@ function getDisplayFilename(filename = "") {
 }
 
 const Private = () => {
+  const { t } = useLanguage();
+
   const {
     user,
     loading,
@@ -201,7 +204,7 @@ const Private = () => {
       } catch (err) {
         setError(
           err.message ||
-          "Unable to load photos."
+          t.private.loadPhotosError
         );
       } finally {
         setPhotosLoading(false);
@@ -225,7 +228,7 @@ const Private = () => {
         } catch (err) {
           setError(
             err.message ||
-            "Unable to load dashboard."
+            t.private.loadDashboardError
           );
         }
       };
@@ -414,7 +417,7 @@ const Private = () => {
       valid.length !== selected.length
     ) {
       setError(
-        "Only JPG, PNG and WEBP photos are allowed."
+        t.private.invalidType
       );
 
       return;
@@ -422,7 +425,7 @@ const Private = () => {
 
     if (valid.length > 10) {
       setError(
-        "You can upload up to 10 photos at once."
+        t.private.tooManyPhotos
       );
 
       return;
@@ -471,14 +474,14 @@ const Private = () => {
 
       setMessage(
         body.message ||
-        "Photos uploaded successfully."
+        t.private.uploadSuccess
       );
 
       await loadPhotos();
     } catch (err) {
       setError(
         err.message ||
-        "Unable to upload photos."
+        t.private.uploadError
       );
     } finally {
       setUploading(false);
@@ -557,7 +560,7 @@ const Private = () => {
 
     if (!cleanName) {
       setError(
-        "Please enter a photo name."
+        t.private.nameRequired
       );
       return;
     }
@@ -588,7 +591,7 @@ const Private = () => {
 
       setMessage(
         body.message ||
-        "Photo renamed successfully."
+        t.private.renameSuccess
       );
 
       setEditingPhoto(null);
@@ -598,7 +601,7 @@ const Private = () => {
     } catch (err) {
       setError(
         err.message ||
-        "Unable to rename photo."
+        t.private.renameError
       );
     } finally {
       setPhotoActionLoading(false);
@@ -629,7 +632,7 @@ const Private = () => {
 
       setMessage(
         body.message ||
-        "Photo deleted successfully."
+        t.private.deleteSuccess
       );
 
       setDeletingPhoto(null);
@@ -638,7 +641,7 @@ const Private = () => {
     } catch (err) {
       setError(
         err.message ||
-        "Unable to delete photo."
+        t.private.deleteError
       );
     } finally {
       setPhotoActionLoading(false);
@@ -675,7 +678,7 @@ const Private = () => {
     } catch (err) {
       setError(
         err.message ||
-        "Unable to download photo."
+        t.private.downloadError
       );
     }
   }
@@ -684,7 +687,7 @@ const Private = () => {
     return (
       <main className="private-library-page">
         <div className="private-loading-card">
-          Loading secure dashboard...
+          {t.private.loadingDashboard}
         </div>
       </main>
     );
@@ -706,20 +709,17 @@ const Private = () => {
         <header className="private-library-header">
           <div>
             <span className="private-library-eyebrow">
-              PRIVATE PHOTO LIBRARY
+              {t.private.eyebrow}
             </span>
 
             <h1>
-              Welcome back,
+              {t.private.welcomeBack}
               {" "}
               {user?.name}
             </h1>
 
             <p>
-              Your secure personal photo
-              collection. Upload, preview and
-              download your images from one
-              private workspace.
+              {t.private.description}
             </p>
           </div>
 
@@ -735,8 +735,8 @@ const Private = () => {
               <span>＋</span>
 
               {uploading
-                ? "Uploading..."
-                : "Upload Photos"}
+                ? t.private.uploading
+                : t.private.uploadPhotos}
             </button>
 
             <button
@@ -744,7 +744,7 @@ const Private = () => {
               className="private-signout-button"
               onClick={logout}
             >
-              Sign out
+              {t.private.signOut}
             </button>
           </div>
         </header>
@@ -813,12 +813,11 @@ const Private = () => {
 
           <div className="private-drop-copy">
             <strong>
-              Drop your photos here
+              {t.private.dropTitle}
             </strong>
 
             <span>
-              JPG, PNG or WEBP · Maximum
-              10 MB each · Up to 10 at once
+              {t.private.dropHelp}
             </span>
           </div>
 
@@ -830,7 +829,7 @@ const Private = () => {
               fileInputRef.current?.click()
             }
           >
-            Choose Photos
+            {t.private.choosePhotos}
           </button>
         </section>
 
@@ -838,28 +837,28 @@ const Private = () => {
           <div className="private-library-toolbar">
             <div>
               <span>
-                YOUR PHOTOS
+                {t.private.yourPhotos}
               </span>
 
               <h2>
-                Photo collection
+                {t.private.photoCollection}
               </h2>
             </div>
 
             <div className="private-photo-count">
               {photosLoading
-                ? "Loading..."
+                ? t.private.loading
                 : `${photos.length} ${
                     photos.length === 1
-                      ? "photo"
-                      : "photos"
+                      ? t.private.photo
+                      : t.private.photos
                   }`}
             </div>
           </div>
 
           {photosLoading && (
             <div className="private-gallery-state">
-              Loading your photos...
+              {t.private.loadingPhotos}
             </div>
           )}
 
@@ -871,13 +870,11 @@ const Private = () => {
                 </div>
 
                 <h3>
-                  Your library is empty
+                  {t.private.emptyTitle}
                 </h3>
 
                 <p>
-                  Upload your first photo to
-                  start building your private
-                  collection.
+                  {t.private.emptyText}
                 </p>
 
                 <button
@@ -887,7 +884,7 @@ const Private = () => {
                     fileInputRef.current?.click()
                   }
                 >
-                  ＋ Upload first photo
+                  ＋ {t.private.uploadFirst}
                 </button>
               </div>
             )}
@@ -967,7 +964,7 @@ const Private = () => {
                             openEditPhoto(photo)
                           }
                         >
-                          ✎ Edit
+                          ✎ {t.private.edit}
                         </button>
 
                         <button
@@ -991,7 +988,7 @@ const Private = () => {
                             setError("");
                           }}
                         >
-                          Delete
+                          {t.private.delete}
                         </button>
                       </div>
                     </div>
@@ -1021,7 +1018,7 @@ const Private = () => {
                 className="private-image-viewer"
                 role="dialog"
                 aria-modal="true"
-                aria-label="Photo preview"
+                aria-label={t.private.preview}
               >
                 <header className="private-viewer-header">
                   <div>
@@ -1039,7 +1036,7 @@ const Private = () => {
                   <button
                     type="button"
                     className="private-viewer-close"
-                    aria-label="Close preview"
+                    aria-label={t.private.closePreview}
                     onClick={closePreview}
                   >
                     ×
@@ -1052,7 +1049,7 @@ const Private = () => {
                     <button
                       type="button"
                       className="private-viewer-nav private-viewer-prev"
-                      aria-label="Previous photo"
+                      aria-label={t.private.previousPhoto}
                       onClick={() =>
                         movePreview(-1)
                       }
@@ -1076,7 +1073,7 @@ const Private = () => {
                     <button
                       type="button"
                       className="private-viewer-nav private-viewer-next"
-                      aria-label="Next photo"
+                      aria-label={t.private.nextPhoto}
                       onClick={() =>
                         movePreview(1)
                       }
@@ -1133,7 +1130,7 @@ const Private = () => {
                         );
                       }}
                     >
-                      ✎ Edit
+                      ✎ {t.private.edit}
                     </button>
 
                     <button
@@ -1152,7 +1149,7 @@ const Private = () => {
                 </footer>
 
                 <div className="private-viewer-hint">
-                  ← → navigate · Esc close
+                  {t.private.viewerHint}
                 </div>
 
               </section>
@@ -1188,7 +1185,7 @@ const Private = () => {
               </span>
 
               <h2 id="edit-photo-title">
-                Rename photo
+                {t.private.renamePhoto}
               </h2>
 
               <p>
@@ -1202,7 +1199,7 @@ const Private = () => {
                 className="private-edit-label"
                 htmlFor="private-photo-name"
               >
-                Photo name
+                {t.private.photoName}
               </label>
 
               <input
@@ -1243,7 +1240,7 @@ const Private = () => {
                     setEditingPhoto(null)
                   }
                 >
-                  Cancel
+                  {t.private.cancel}
                 </button>
 
                 <button
@@ -1253,8 +1250,8 @@ const Private = () => {
                   onClick={renamePhoto}
                 >
                   {photoActionLoading
-                    ? "Saving..."
-                    : "Save changes"}
+                    ? t.private.saving
+                    : t.private.saveChanges}
                 </button>
               </div>
             </section>
@@ -1290,7 +1287,7 @@ const Private = () => {
               </span>
 
               <h2 id="delete-photo-title">
-                Delete this photo?
+                {t.private.deletePhotoTitle}
               </h2>
 
               <p>
@@ -1298,9 +1295,7 @@ const Private = () => {
                   {deletingPhoto.filename}
                 </strong>
                 {" "}
-                will be permanently removed
-                from your private library.
-                This action cannot be undone.
+                {t.private.deleteDescription}
               </p>
 
               <div className="private-modal-actions">
@@ -1312,7 +1307,7 @@ const Private = () => {
                     setDeletingPhoto(null)
                   }
                 >
-                  Keep photo
+                  {t.private.keepPhoto}
                 </button>
 
                 <button
@@ -1322,8 +1317,8 @@ const Private = () => {
                   onClick={deletePhoto}
                 >
                   {photoActionLoading
-                    ? "Deleting..."
-                    : "Delete permanently"}
+                    ? t.private.deleting
+                    : t.private.deletePermanently}
                 </button>
               </div>
             </section>

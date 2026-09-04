@@ -11,12 +11,20 @@ import {
   useAuth,
 } from "../context/AuthContext";
 
+import {
+  useLanguage,
+} from "../context/LanguageContext";
+
 const Register = () => {
   const navigate = useNavigate();
 
   const {
     register,
   } = useAuth();
+
+  const {
+    t,
+  } = useLanguage();
 
   const [
     form,
@@ -61,7 +69,7 @@ const Register = () => {
         form.password.length < 8
       ) {
         setError(
-          "Password must contain at least 8 characters."
+          t.register.passwordTooShort
         );
 
         return;
@@ -76,7 +84,7 @@ const Register = () => {
       } catch (err) {
         setError(
           err.message ||
-          "Unable to create account."
+          t.register.errorFallback
         );
       } finally {
         setSubmitting(false);
@@ -88,16 +96,15 @@ const Register = () => {
       <section className="auth-card">
 
         <p className="eyebrow">
-          Join the website
+          {t.register.eyebrow}
         </p>
 
         <h1>
-          Create account
+          {t.register.title}
         </h1>
 
         <p>
-          Create your account to access
-          the private area.
+          {t.register.description}
         </p>
 
         {error && (
@@ -112,13 +119,14 @@ const Register = () => {
         >
           <div className="form-group">
             <label htmlFor="name">
-              Full name
+              {t.register.fullName}
             </label>
 
             <input
               id="name"
               name="name"
               type="text"
+              autoComplete="name"
               value={form.name}
               onChange={updateField}
               required
@@ -127,7 +135,7 @@ const Register = () => {
 
           <div className="form-group">
             <label htmlFor="username">
-              Username
+              {t.register.username}
             </label>
 
             <input
@@ -143,7 +151,7 @@ const Register = () => {
 
           <div className="form-group">
             <label htmlFor="email">
-              Email
+              {t.register.email}
             </label>
 
             <input
@@ -159,7 +167,7 @@ const Register = () => {
 
           <div className="form-group">
             <label htmlFor="password">
-              Password
+              {t.register.password}
             </label>
 
             <input
@@ -180,18 +188,19 @@ const Register = () => {
             disabled={submitting}
           >
             {submitting
-              ? "Creating account..."
-              : "Create account"}
+              ? t.register.submitting
+              : t.register.submit}
           </button>
         </form>
 
         <p className="mt-6 text-center">
-          Already have an account?{" "}
+          {t.register.alreadyAccount}{" "}
+
           <Link
             to="/login"
             className="font-semibold text-blue-400 hover:text-blue-300"
           >
-            Sign in
+            {t.register.signIn}
           </Link>
         </p>
 

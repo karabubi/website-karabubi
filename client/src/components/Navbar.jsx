@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import salehImage from "../assets/saleh.jpg";
 
 function Navbar() {
@@ -13,6 +14,12 @@ function Navbar() {
     loading,
     logout,
   } = useAuth();
+
+  const {
+    language,
+    setLanguage,
+    t,
+  } = useLanguage();
 
   const navClass = ({ isActive }) =>
     [
@@ -25,7 +32,6 @@ function Navbar() {
   return (
     <header className="site-navbar">
       <div className="site-navbar-inner">
-
         <Link
           to="/"
           className="site-brand"
@@ -33,7 +39,6 @@ function Navbar() {
           <span className="site-brand-logo">
             SA
           </span>
-
         </Link>
 
         <nav className="site-nav-links">
@@ -41,32 +46,52 @@ function Navbar() {
             to="/"
             className={navClass}
           >
-            Home
+            {t.nav.home}
           </NavLink>
 
           <NavLink
             to="/about"
             className={navClass}
           >
-            About
+            {t.nav.about}
           </NavLink>
 
           <NavLink
             to="/photos"
             className={navClass}
           >
-            Projects
+            {t.nav.projects}
           </NavLink>
 
           <NavLink
             to="/contact"
             className={navClass}
           >
-            Contact
+            {t.nav.contact}
           </NavLink>
         </nav>
 
         <div className="site-nav-actions">
+          <select
+            value={language}
+            onChange={(event) =>
+              setLanguage(event.target.value)
+            }
+            aria-label="Select language"
+          >
+            <option value="en">
+              🇬🇧 English
+            </option>
+
+            <option value="de">
+              🇩🇪 Deutsch
+            </option>
+
+            <option value="ar">
+              🇸🇦 العربية
+            </option>
+          </select>
+
           {!loading && user ? (
             <>
               <Link
@@ -85,7 +110,7 @@ function Navbar() {
                   </strong>
 
                   <small>
-                    Dashboard
+                    {t.nav.dashboard}
                   </small>
                 </span>
               </Link>
@@ -95,7 +120,7 @@ function Navbar() {
                 className="nav-signout"
                 onClick={logout}
               >
-                Sign out
+                {t.nav.signOut}
               </button>
             </>
           ) : !loading ? (
@@ -104,19 +129,18 @@ function Navbar() {
                 to="/login"
                 className="nav-login"
               >
-                Sign in
+                {t.nav.signIn}
               </NavLink>
 
               <NavLink
                 to="/register"
                 className="nav-register"
               >
-                Create account
+                {t.nav.createAccount}
               </NavLink>
             </>
           ) : null}
         </div>
-
       </div>
     </header>
   );

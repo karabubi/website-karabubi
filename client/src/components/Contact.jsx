@@ -1,4 +1,5 @@
 import React from "react";
+import { useLanguage } from "../context/LanguageContext";
 
 function MailIcon() {
   return (
@@ -31,18 +32,20 @@ function PhoneIcon() {
 }
 
 function Contact() {
+  const { t } = useLanguage();
+
   return (
     <main className="contact-page">
       <section className="contact-shell">
         <div className="contact-heading">
           <span className="contact-eyebrow">
-            CONTACT
+            {t.contact.eyebrow}
           </span>
 
-          <h1>Get in touch</h1>
+          <h1>{t.contact.title}</h1>
 
           <p>
-            You can contact me directly by email or telephone.
+            {t.contact.description}
           </p>
         </div>
 
@@ -56,12 +59,12 @@ function Contact() {
             </span>
 
             <span className="contact-card-copy">
-              <small>Email</small>
+              <small>{t.contact.email}</small>
               <strong>
                 karabubi66@yahoo.com
               </strong>
               <span>
-                Send me an email
+                {t.contact.sendEmail}
               </span>
             </span>
 
@@ -82,12 +85,12 @@ function Contact() {
             </span>
 
             <span className="contact-card-copy">
-              <small>Telephone</small>
+              <small>{t.contact.telephone}</small>
               <strong>
                 0049 176 55105979
               </strong>
               <span>
-                Call directly
+                {t.contact.callDirectly}
               </span>
             </span>
 

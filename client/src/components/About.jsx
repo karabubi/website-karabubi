@@ -1,5 +1,6 @@
 import React from "react";
 import salehPhoto from "../assets/saleh.jpg";
+import { useLanguage } from "../context/LanguageContext";
 
 function DocumentIcon({ type }) {
   if (type === "cv") {
@@ -32,6 +33,8 @@ function DocumentIcon({ type }) {
 }
 
 function About() {
+  const { t } = useLanguage();
+
   return (
     <main className="about-page">
       <section className="about-shell">
@@ -39,43 +42,36 @@ function About() {
           <div className="about-photo-frame">
             <img
               src={salehPhoto}
-              alt="Saleh Alkarabubi"
+              alt={t.about.name}
               className="about-profile-photo"
             />
           </div>
 
           <div className="about-location">
             <span className="about-status-dot" />
-            Bonn, Germany
+            {t.about.location}
           </div>
         </div>
 
         <div className="about-content">
           <span className="about-eyebrow">
-            ABOUT ME
+            {t.about.eyebrow}
           </span>
 
           <h1 className="about-title">
-            Saleh Alkarabubi
+            {t.about.name}
           </h1>
 
           <p className="about-role">
-            Full-Stack Web Developer
+            {t.about.role}
           </p>
 
           <p className="about-introduction">
-            I build modern web applications with a strong
-            focus on clean architecture, responsive user
-            interfaces and reliable backend systems.
+            {t.about.introduction}
           </p>
 
           <p className="about-description">
-            My current development stack includes React,
-            Node.js, Express, REST APIs and PostgreSQL.
-            I work with Git and GitHub for version control
-            and use modern authentication and API design
-            patterns to build maintainable full-stack
-            applications.
+            {t.about.description}
           </p>
 
 <div className="about-document-actions">
@@ -88,8 +84,8 @@ function About() {
               </span>
 
               <span className="about-doc-text">
-                <strong>View CV</strong>
-                <small>Curriculum Vitae</small>
+                <strong>{t.about.viewCv}</strong>
+                <small>{t.about.curriculumVitae}</small>
               </span>
 
               <span
@@ -109,9 +105,9 @@ function About() {
               </span>
 
               <span className="about-doc-text">
-                <strong>View Certificates</strong>
+                <strong>{t.about.viewCertificates}</strong>
                 <small>
-                  Qualifications & Training
+                  {t.about.qualificationsTraining}
                 </small>
               </span>
 

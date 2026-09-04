@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext";
 
 function ArrowIcon() {
   return (
@@ -39,56 +40,57 @@ function CodeIcon() {
   );
 }
 
-const focusItems = [
-  {
-    number: "01",
-    label: "Frontend",
-    value: "React / TypeScript",
-  },
-  {
-    number: "02",
-    label: "Backend",
-    value: "Node.js / Express",
-  },
-  {
-    number: "03",
-    label: "Database",
-    value: "PostgreSQL",
-  },
-  {
-    number: "04",
-    label: "Focus",
-    value: "Full-Stack Development",
-  },
-];
+function getFocusItems(t) {
+  return [
+    {
+      number: "01",
+      label: t.home.frontend,
+      value: "React / TypeScript",
+    },
+    {
+      number: "02",
+      label: t.home.backend,
+      value: "Node.js / Express",
+    },
+    {
+      number: "03",
+      label: t.home.database,
+      value: "PostgreSQL",
+    },
+    {
+      number: "04",
+      label: t.home.focus,
+      value: t.home.fullStackDevelopment,
+    },
+  ];
+}
 
 function Home() {
+  const { t } = useLanguage();
+  const focusItems = getFocusItems(t);
+
   return (
     <main className="home-hero-page">
       <section className="home-hero-shell">
         <div className="home-hero-content">
           <div className="home-availability">
             <span className="home-availability-dot" />
-            Available for web development
+            {t.home.available}
           </div>
 
           <div className="home-hero-heading">
             <span className="home-hero-name">
-              Saleh Alkarabubi
+              {t.home.name}
             </span>
 
             <h1>
-              Full-Stack
-              <span> Web Developer</span>
+              {t.home.titleMain}
+              <span>{t.home.titleHighlight}</span>
             </h1>
           </div>
 
           <p className="home-hero-description">
-            I build modern, reliable full-stack web
-            applications with React, Node.js, Express
-            and PostgreSQL, focusing on clean interfaces,
-            practical functionality and maintainable
-            software.
+            {t.home.description}
           </p>
 
           <div className="home-hero-actions">
@@ -96,7 +98,7 @@ function Home() {
               to="/photos"
               className="home-primary-button"
             >
-              View Projects
+              {t.home.viewProjects}
               <ArrowIcon />
             </Link>
 
@@ -104,20 +106,20 @@ function Home() {
               to="/about"
               className="home-secondary-button"
             >
-              About Me
+              {t.home.aboutMe}
             </Link>
 
             <Link
               to="/contact"
               className="home-secondary-button"
             >
-              Contact Me
+              {t.home.contactMe}
             </Link>
           </div>
 
           <div className="home-tech-section">
             <span className="home-tech-label">
-              CORE TECHNOLOGIES
+              {t.home.coreTechnologies}
             </span>
 
             <div className="home-tech-list">
@@ -137,7 +139,7 @@ function Home() {
             <span className="home-location-icon">
               ◎
             </span>
-            Bonn, Germany
+            {t.home.location}
           </div>
         </div>
 
@@ -149,13 +151,13 @@ function Home() {
               </span>
 
               <div>
-                <span>DEVELOPER PROFILE</span>
-                <strong>Technical Focus</strong>
+                <span>{t.home.developerProfile}</span>
+                <strong>{t.home.technicalFocus}</strong>
               </div>
             </div>
 
             <span className="home-panel-status">
-              ACTIVE
+              {t.home.active}
             </span>
           </div>
 
@@ -181,7 +183,7 @@ function Home() {
 
           <div className="home-panel-footer">
             <span>
-              Modern web applications
+              {t.home.modernWebApplications}
             </span>
 
             <span className="home-panel-footer-mark">

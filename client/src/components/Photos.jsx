@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useLanguage } from "../context/LanguageContext";
 
 const GITHUB_USERNAME = "karabubi";
 
@@ -78,7 +79,7 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
-function getDefinition(repo) {
+function getDefinition(repo, fallbackDescription) {
   if (repo.description) {
     return repo.description;
   }
@@ -87,10 +88,11 @@ function getDefinition(repo) {
     return projectDefinitions[repo.name];
   }
 
-  return "Public software-development project. Open the repository to explore the source code, documentation and implementation.";
+  return fallbackDescription;
 }
 
 function Photos() {
+  const { t } = useLanguage();
   const [repositories, setRepositories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -156,20 +158,15 @@ function Photos() {
         <header className="projects-modern-hero">
           <div className="projects-modern-intro">
             <span className="projects-modern-kicker">
-              DEVELOPMENT PORTFOLIO
+              {t.projects.kicker}
             </span>
 
             <h1>
-              Projects that turn ideas
-              <span> into working software.</span>
+              {t.projects.titleBefore}
+              <span>{t.projects.titleHighlight}</span>
             </h1>
 
-            <p>
-              A selection of my public development
-              projects covering full-stack applications,
-              web interfaces, APIs, databases and
-              practical software solutions.
-            </p>
+            <p>{t.projects.intro}</p>
 
             <div className="projects-modern-actions">
               <a
@@ -177,7 +174,7 @@ function Photos() {
                 className="projects-profile-button"
               >
                 <GitHubIcon />
-                <span>GitHub Profile</span>
+                <span>{t.projects.githubProfile}</span>
                 <span aria-hidden="true">↗</span>
               </a>
 
@@ -186,7 +183,7 @@ function Photos() {
                 className="projects-profile-button projects-linkedin-button"
               >
                 <LinkedInIcon />
-                <span>LinkedIn</span>
+                <span>{t.projects.linkedinProfile}</span>
                 <span aria-hidden="true">↗</span>
               </a>
 
@@ -194,14 +191,14 @@ function Photos() {
                 href="/"
                 className="projects-home-button"
               >
-                ← Home
+                ← {t.projects.home}
               </a>
             </div>
           </div>
 
           <aside className="projects-summary-card">
             <span className="projects-summary-label">
-              PUBLIC WORK
+              {t.projects.publicWork}
             </span>
 
             <strong>
@@ -209,7 +206,7 @@ function Photos() {
             </strong>
 
             <span>
-              GitHub projects
+              {t.projects.githubProjects}
             </span>
 
             <div className="projects-summary-divider" />
@@ -219,12 +216,12 @@ function Photos() {
                 <strong>
                   {loading ? "—" : languageCount}
                 </strong>
-                <span>Languages</span>
+                <span>{t.projects.languages}</span>
               </div>
 
               <div>
-                <strong>Full Stack</strong>
-                <span>Primary focus</span>
+                <strong>{t.projects.fullStack}</strong>
+                <span>{t.projects.primaryFocus}</span>
               </div>
             </div>
           </aside>
@@ -233,13 +230,13 @@ function Photos() {
         <section className="projects-work-section">
           <div className="projects-section-heading">
             <div>
-              <span>ALL PROJECTS</span>
-              <h2>GitHub repositories</h2>
+              <span>{t.projects.allProjects}</span>
+              <h2>{t.projects.repositories}</h2>
             </div>
 
             {!loading && !loadError && (
               <p>
-                {repositories.length} public projects
+                {repositories.length} {t.projects.publicProjects}
               </p>
             )}
           </div>
@@ -247,19 +244,18 @@ function Photos() {
           {loading && (
             <div className="projects-loading">
               <span className="projects-loading-dot" />
-              Loading projects from GitHub...
+              {t.projects.loading}
             </div>
           )}
 
           {loadError && (
             <div className="projects-error">
               <strong>
-                GitHub projects could not be loaded.
+                {t.projects.loadError}
               </strong>
 
               <span>
-                You can still open my GitHub profile
-                using the button above.
+                {t.projects.loadErrorHelp}
               </span>
             </div>
           )}
@@ -268,7 +264,7 @@ function Photos() {
             !loadError &&
             repositories.length === 0 && (
               <div className="projects-error">
-                No public repositories found.
+                {t.projects.noRepositories}
               </div>
             )}
 
@@ -295,7 +291,7 @@ function Photos() {
                       <h3>{repo.name}</h3>
 
                       <p>
-                        {getDefinition(repo)}
+                        {getDefinition(repo, t.projects.defaultDescription)}
                       </p>
                     </div>
 
@@ -309,7 +305,7 @@ function Photos() {
 
                       {repo.updated_at && (
                         <span>
-                          Updated {formatDate(repo.updated_at)}
+                          {t.projects.updated} {formatDate(repo.updated_at)}
                         </span>
                       )}
                     </div>
@@ -321,7 +317,7 @@ function Photos() {
                         </span>
 
                         <span>
-                          Forks {repo.forks_count}
+                          {t.projects.forks} {repo.forks_count}
                         </span>
                       </div>
 
@@ -331,7 +327,7 @@ function Photos() {
                         rel="noopener noreferrer"
                         className="project-repository-link"
                       >
-                        View repository
+                        {t.projects.viewRepository}
                         <span aria-hidden="true">↗</span>
                       </a>
                     </div>

@@ -10,9 +10,11 @@ import {
 import {
   useAuth,
 } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const {
     login,
@@ -55,7 +57,7 @@ const Login = () => {
       } catch (err) {
         setError(
           err.message ||
-          "Unable to sign in."
+          t.login.errorFallback
         );
       } finally {
         setSubmitting(false);
@@ -67,16 +69,13 @@ const Login = () => {
       <section className="auth-card">
 
         <p className="eyebrow">
-          Welcome back
+          {t.login.eyebrow}
         </p>
 
-        <h1>
-          Sign in
-        </h1>
+        <h1>{t.login.title}</h1>
 
         <p>
-          Enter your username or email
-          and password.
+          {t.login.description}
         </p>
 
         {error && (
@@ -91,7 +90,7 @@ const Login = () => {
         >
           <div className="form-group">
             <label htmlFor="identifier">
-              Username or email
+              {t.login.identifierLabel}
             </label>
 
             <input
@@ -104,14 +103,14 @@ const Login = () => {
                   event.target.value
                 )
               }
-              placeholder="Username or email"
+              placeholder={t.login.identifierPlaceholder}
               required
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="password">
-              Password
+              {t.login.passwordLabel}
             </label>
 
             <input
@@ -124,7 +123,7 @@ const Login = () => {
                   event.target.value
                 )
               }
-              placeholder="Your password"
+              placeholder={t.login.passwordPlaceholder}
               required
             />
           </div>
@@ -135,18 +134,18 @@ const Login = () => {
             disabled={submitting}
           >
             {submitting
-              ? "Signing in..."
-              : "Sign in"}
+              ? t.login.submitting
+              : t.login.submit}
           </button>
         </form>
 
         <p className="mt-6 text-center">
-          New here?{" "}
+          {t.login.newHere}{" "}
           <Link
             to="/register"
             className="font-semibold text-blue-400 hover:text-blue-300"
           >
-            Create an account
+            {t.login.createAccount}
           </Link>
         </p>
 
