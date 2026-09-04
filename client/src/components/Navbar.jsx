@@ -6,7 +6,7 @@ import {
 
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
-import salehImage from "../assets/saleh.jpg";
+import salehImage from "../assets/saleh-nav.jpg";
 
 function Navbar() {
   const {
