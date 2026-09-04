@@ -3967,3 +3967,45 @@ html[dir="rtl"] .project-card-actions a {
     flex: 0 0 auto;
   }
 }
+
+/* =====================================================
+   Phase 28B - Project technology badges
+   ===================================================== */
+
+.project-tech-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.project-tech-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 999px;
+  background: rgba(30, 41, 59, 0.62);
+  color: #cbd5e1;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+html[dir="rtl"] .project-tech-list {
+  direction: rtl;
+}
+
+@media (max-width: 640px) {
+  .project-tech-list {
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .project-tech-badge {
+    padding: 5px 9px;
+    font-size: 0.72rem;
+  }
+}

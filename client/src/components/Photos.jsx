@@ -20,6 +20,59 @@ const projectDefinitions = {
     "Personal portfolio project for presenting development work, technical skills and professional information.",
 };
 
+const projectTechnologies = {
+  "euroatlas-cargo-platform": [
+    "Next.js",
+    "NestJS",
+    "TypeScript",
+    "PostgreSQL",
+  ],
+
+  AutoMarket25: [
+    "React",
+    "Node.js",
+    "Express",
+    "PostgreSQL",
+  ],
+
+  "Delivery-man-system": [
+    "JavaScript",
+    "Node.js",
+    "Express",
+  ],
+
+  "website-karabubi": [
+    "React",
+    "Express",
+    "PostgreSQL",
+    "JWT",
+  ],
+
+  PortfolioSite: [
+    "React",
+    "JavaScript",
+    "CSS",
+  ],
+};
+
+function getProjectTechnologies(repo) {
+  const configured =
+    projectTechnologies[repo?.name];
+
+  if (
+    Array.isArray(configured) &&
+    configured.length > 0
+  ) {
+    return configured;
+  }
+
+  if (repo?.language) {
+    return [repo.language];
+  }
+
+  return [];
+}
+
 function getLiveDemoUrl(repo) {
   const value = String(repo?.homepage || "").trim();
 
@@ -347,6 +400,24 @@ function Photos() {
                         </span>
                       )}
                     </div>
+
+                    {getProjectTechnologies(repo).length > 0 && (
+                      <div
+                        className="project-tech-list"
+                        aria-label="Project technologies"
+                      >
+                        {getProjectTechnologies(repo).map(
+                          (technology) => (
+                            <span
+                              className="project-tech-badge"
+                              key={technology}
+                            >
+                              {technology}
+                            </span>
+                          )
+                        )}
+                      </div>
+                    )}
 
                     <div className="project-modern-footer">
                       <div className="project-modern-stats">
