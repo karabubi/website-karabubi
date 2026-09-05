@@ -148,6 +148,7 @@ const Private = () => {
   } = useAuth();
 
   const fileInputRef = useRef(null);
+  const documentInputRef = useRef(null);
 
   const [message, setMessage] =
     useState("");
@@ -186,6 +187,47 @@ const Private = () => {
 
   const [previewUrls, setPreviewUrls] =
     useState({});
+
+  const [documents, setDocuments] =
+    useState([]);
+
+  const [documentsLoading, setDocumentsLoading] =
+    useState(true);
+
+  const [documentsUploading, setDocumentsUploading] =
+    useState(false);
+
+  const [deletingDocument, setDeletingDocument] =
+    useState(null);
+
+  const [documentActionLoading, setDocumentActionLoading] =
+    useState(false);
+
+  const loadDocuments = useCallback(
+    async () => {
+      setDocumentsLoading(true);
+
+      try {
+        const response =
+          await privateFetch(
+            "/private/documents"
+          );
+
+        const body =
+          await response.json();
+
+        setDocuments(body.documents || []);
+      } catch (err) {
+        setError(
+          err.message ||
+          t.private.documentLoadError
+        );
+      } finally {
+        setDocumentsLoading(false);
+      }
+    },
+    []
+  );
 
   const loadPhotos = useCallback(
     async () => {
@@ -236,9 +278,11 @@ const Private = () => {
 
     loadDashboard();
     loadPhotos();
+    loadDocuments();
   }, [
     isAuthenticated,
     loadPhotos,
+    loadDocuments,
   ]);
 
   useEffect(() => {
@@ -490,6 +534,178 @@ const Private = () => {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+    }
+  }
+
+  async function uploadDocuments(files) {
+    const selected =
+      Array.from(files || []);
+
+    if (!selected.length) {
+      return;
+    }
+
+    const allowedExtensions = [
+      ".pdf",
+      ".doc",
+      ".docx",
+      ".xls",
+      ".xlsx",
+      ".csv",
+      ".txt",
+    ];
+
+    const invalid = selected.find((file) => {
+      const name =
+        file.name.toLowerCase();
+
+      return !allowedExtensions.some(
+        (extension) =>
+          name.endsWith(extension)
+      );
+    });
+
+    if (invalid) {
+      setError(
+        t.private.invalidDocumentType
+      );
+      return;
+    }
+
+    const tooLarge =
+      selected.find(
+        (file) =>
+          file.size >
+          20 * 1024 * 1024
+      );
+
+    if (tooLarge) {
+      setError(
+        `${tooLarge.name} ${t.private.documentTooLarge}`
+      );
+      return;
+    }
+
+    const formData =
+      new FormData();
+
+    selected.forEach((file) => {
+      formData.append(
+        "documents",
+        file
+      );
+    });
+
+    setDocumentsUploading(true);
+    setError("");
+
+    try {
+      const response =
+        await privateFetch(
+          "/private/documents",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+      const body =
+        await response.json();
+
+      setMessage(
+        body.message ||
+        t.private.documentUploadSuccess
+      );
+
+      await loadDocuments();
+    } catch (err) {
+      setError(
+        err.message ||
+        t.private.documentUploadError
+      );
+    } finally {
+      setDocumentsUploading(false);
+
+      if (documentInputRef.current) {
+        documentInputRef.current.value = "";
+      }
+    }
+  }
+
+  async function downloadDocument(documentFile) {
+    try {
+      const response =
+        await privateFetch(
+          documentFile.downloadUrl
+        );
+
+      const blob =
+        await response.blob();
+
+      const url =
+        URL.createObjectURL(blob);
+
+      const anchor =
+        window.document.createElement("a");
+
+      anchor.href = url;
+      anchor.download =
+        documentFile.filename ||
+        "document";
+
+      window.document.body.appendChild(
+        anchor
+      );
+
+      anchor.click();
+      anchor.remove();
+
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(
+        err.message ||
+        t.private.documentDownloadError
+      );
+    }
+  }
+
+  async function deleteDocument() {
+    if (!deletingDocument) {
+      return;
+    }
+
+    setDocumentActionLoading(true);
+    setError("");
+
+    try {
+      const response =
+        await privateFetch(
+          `/private/documents/${encodeURIComponent(
+            deletingDocument.storedFilename
+          )}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+      const body =
+        await response.json();
+
+      setMessage(
+        body.message ||
+        "Document deleted successfully."
+      );
+
+      setDeletingDocument(null);
+
+      await loadDocuments();
+    } catch (err) {
+      setError(
+        err.message ||
+        t.private.documentDeleteError
+      );
+    } finally {
+      setDocumentActionLoading(false);
     }
   }
 
@@ -763,6 +979,19 @@ const Private = () => {
           }
         />
 
+        <input
+          ref={documentInputRef}
+          type="file"
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+          multiple
+          hidden
+          onChange={(event) =>
+            uploadDocuments(
+              event.target.files
+            )
+          }
+        />
+
         {error && (
           <div className="private-library-error">
             {error}
@@ -832,6 +1061,143 @@ const Private = () => {
           >
             {t.private.choosePhotos}
           </button>
+        </section>
+
+        <section className="private-documents-section">
+          <div className="private-library-toolbar">
+            <div>
+              <span>
+                {t.private.yourDocuments}
+              </span>
+
+              <h2>
+                {t.private.documentCollection}
+              </h2>
+            </div>
+
+            <div className="private-photo-count">
+              {documentsLoading
+                ? t.private.loading
+                : `${documents.length} ${
+                    documents.length === 1
+                      ? t.private.document
+                      : t.private.documents
+                  }`}
+            </div>
+          </div>
+
+          <div className="private-document-upload-row">
+            <button
+              type="button"
+              className="private-upload-button"
+              disabled={documentsUploading}
+              onClick={() =>
+                documentInputRef.current?.click()
+              }
+            >
+              <span>＋</span>
+              {documentsUploading
+                ? t.private.uploadingDocuments
+                : t.private.uploadDocuments}
+            </button>
+
+            <span className="private-document-help">
+              {t.private.documentHelp}
+            </span>
+          </div>
+
+          {documentsLoading && (
+            <div className="private-gallery-state">
+              {t.private.loadingDocuments}
+            </div>
+          )}
+
+          {!documentsLoading &&
+            documents.length === 0 && (
+              <div className="private-empty-gallery">
+                <div className="private-empty-icon">
+                  ▤
+                </div>
+
+                <h3>
+                  {t.private.noDocumentsTitle}
+                </h3>
+
+                <p>
+                  {t.private.noDocumentsText}
+                </p>
+
+                <button
+                  type="button"
+                  className="private-upload-button"
+                  onClick={() =>
+                    documentInputRef.current?.click()
+                  }
+                >
+                  ＋ {t.private.uploadFirstDocument}
+                </button>
+              </div>
+            )}
+
+          {!documentsLoading &&
+            documents.length > 0 && (
+              <div className="private-document-list">
+                {documents.map(
+                  (documentFile) => (
+                    <article
+                      className="private-document-card"
+                      key={documentFile.id}
+                    >
+                      <div className="private-document-icon">
+                        ▤
+                      </div>
+
+                      <div className="private-document-info">
+                        <strong>
+                          {documentFile.filename}
+                        </strong>
+
+                        <span>
+                          {formatBytes(
+                            documentFile.size
+                          )}
+                          {" · "}
+                          {formatDate(
+                            documentFile.updatedAt ||
+                            documentFile.uploadedAt
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="private-document-actions">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            downloadDocument(
+                              documentFile
+                            )
+                          }
+                        >
+                          {t.private.downloadDocument}
+                        </button>
+
+                        <button
+                          type="button"
+                          className="private-document-delete"
+                          onClick={() =>
+                            setDeletingDocument(
+                              documentFile
+                            )
+                          }
+                        >
+                          {t.private.deleteDocument}
+                        </button>
+                      </div>
+                    </article>
+                  )
+                )}
+              </div>
+            )}
         </section>
 
         <section className="private-library-content">
@@ -1253,6 +1619,73 @@ const Private = () => {
                   {photoActionLoading
                     ? t.private.saving
                     : t.private.saveChanges}
+                </button>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {deletingDocument && (
+          <div
+            className="private-photo-modal-backdrop"
+            role="presentation"
+            onMouseDown={(event) => {
+              if (
+                event.currentTarget ===
+                  event.target &&
+                !documentActionLoading
+              ) {
+                setDeletingDocument(null);
+              }
+            }}
+          >
+            <section
+              className="private-photo-modal private-delete-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-document-title"
+            >
+              <div className="private-modal-icon private-modal-danger-icon">
+                !
+              </div>
+
+              <span className="private-modal-eyebrow private-danger-eyebrow">
+                {t.private.deleteDocumentEyebrow}
+              </span>
+
+              <h2 id="delete-document-title">
+                {t.private.deleteDocumentTitle}
+              </h2>
+
+              <p>
+                <strong>
+                  {deletingDocument.filename}
+                </strong>
+                {" "}
+                {t.private.deleteDocumentDescription}
+              </p>
+
+              <div className="private-modal-actions">
+                <button
+                  type="button"
+                  className="private-modal-cancel"
+                  disabled={documentActionLoading}
+                  onClick={() =>
+                    setDeletingDocument(null)
+                  }
+                >
+                  {t.private.keepDocument}
+                </button>
+
+                <button
+                  type="button"
+                  className="private-modal-delete"
+                  disabled={documentActionLoading}
+                  onClick={deleteDocument}
+                >
+                  {documentActionLoading
+                    ? t.private.deleting
+                    : t.private.deleteDocumentPermanently}
                 </button>
               </div>
             </section>
