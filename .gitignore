@@ -75,3 +75,7 @@ server/storage/private-photos/*
 !server/storage/private-photos/.gitkeep
 
 server/.env.*
+
+# Private runtime document storage
+server/storage/private-documents/*
+!server/storage/private-documents/.gitkeep

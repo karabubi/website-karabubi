@@ -32,6 +32,168 @@ const ALLOWED_MIME_TYPES = new Set([
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_FILES_PER_UPLOAD = 10;
 
+// =====================================================
+// Private documents
+// =====================================================
+
+const DOCUMENT_STORAGE_ROOT =
+  process.env.PRIVATE_DOCUMENT_STORAGE_ROOT ||
+  (process.env.RAILWAY_VOLUME_MOUNT_PATH
+    ? path.join(
+        process.env.RAILWAY_VOLUME_MOUNT_PATH,
+        "private-documents"
+      )
+    : path.join(
+        __dirname,
+        "..",
+        "storage",
+        "private-documents"
+      ));
+
+const DOCUMENT_MAX_FILE_SIZE = 20 * 1024 * 1024;
+const DOCUMENT_MAX_FILES_PER_UPLOAD = 10;
+
+const ALLOWED_DOCUMENT_EXTENSIONS = new Set([
+  ".pdf",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx",
+  ".csv",
+  ".txt",
+]);
+
+const DOCUMENT_MIME_TYPES = {
+  ".pdf": "application/pdf",
+  ".doc": "application/msword",
+  ".docx":
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".xls": "application/vnd.ms-excel",
+  ".xlsx":
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ".csv": "text/csv",
+  ".txt": "text/plain",
+};
+
+function getUserDocumentDirectory(userId) {
+  const directory = path.join(
+    DOCUMENT_STORAGE_ROOT,
+    String(userId)
+  );
+
+  ensureDirectory(directory);
+
+  return directory;
+}
+
+function getDocumentMimeType(filename) {
+  const extension =
+    path.extname(filename).toLowerCase();
+
+  return (
+    DOCUMENT_MIME_TYPES[extension] ||
+    "application/octet-stream"
+  );
+}
+
+function isAllowedDocument(file) {
+  const extension =
+    path.extname(file.originalname || "").toLowerCase();
+
+  if (!ALLOWED_DOCUMENT_EXTENSIONS.has(extension)) {
+    return false;
+  }
+
+  const expectedMime = DOCUMENT_MIME_TYPES[extension];
+
+  // Some browsers/OSes send generic MIME values for
+  // Office documents, CSV or text files. Extension is
+  // therefore also validated independently.
+  const acceptedGenericTypes = new Set([
+    "application/octet-stream",
+    "application/zip",
+    "application/x-zip-compressed",
+  ]);
+
+  return (
+    file.mimetype === expectedMime ||
+    acceptedGenericTypes.has(file.mimetype) ||
+    (extension === ".csv" &&
+      [
+        "text/csv",
+        "application/csv",
+        "text/plain",
+        "application/vnd.ms-excel",
+      ].includes(file.mimetype)) ||
+    (extension === ".txt" &&
+      [
+        "text/plain",
+        "application/octet-stream",
+      ].includes(file.mimetype))
+  );
+}
+
+function documentToResponse(file) {
+  const encoded =
+    encodeURIComponent(file.filename);
+
+  return {
+    id: file.filename,
+    filename: extractOriginalName(file.filename),
+    storedFilename: file.filename,
+    size: file.size,
+    mimeType:
+      file.mimetype ||
+      getDocumentMimeType(file.filename),
+    uploadedAt: file.birthtime.toISOString(),
+    updatedAt: file.mtime.toISOString(),
+    downloadUrl:
+      `/private/documents/${encoded}/download`,
+  };
+}
+
+const documentStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    try {
+      cb(
+        null,
+        getUserDocumentDirectory(req.user.id)
+      );
+    } catch (error) {
+      cb(error);
+    }
+  },
+
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      storedFilename(file.originalname)
+    );
+  },
+});
+
+const documentUpload = multer({
+  storage: documentStorage,
+
+  limits: {
+    fileSize: DOCUMENT_MAX_FILE_SIZE,
+    files: DOCUMENT_MAX_FILES_PER_UPLOAD,
+  },
+
+  fileFilter: (req, file, cb) => {
+    if (!isAllowedDocument(file)) {
+      return cb(
+        new Error(
+          "Only PDF, DOC, DOCX, XLS, XLSX, CSV and TXT documents are allowed."
+        )
+      );
+    }
+
+    return cb(null, true);
+  },
+});
+
+
 function ensureDirectory(directory) {
   fs.mkdirSync(directory, {
     recursive: true,
@@ -191,6 +353,277 @@ router.get(
       return res.status(500).json({
         success: false,
         error: "Unable to load dashboard.",
+      });
+    }
+  }
+);
+
+
+router.get(
+  "/documents",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const directory =
+        getUserDocumentDirectory(req.user.id);
+
+      const entries = await fs.promises.readdir(
+        directory,
+        {
+          withFileTypes: true,
+        }
+      );
+
+      const documents = [];
+
+      for (const entry of entries) {
+        if (
+          !entry.isFile() ||
+          entry.name.startsWith(".")
+        ) {
+          continue;
+        }
+
+        if (!validateStoredFilename(entry.name)) {
+          continue;
+        }
+
+        const extension =
+          path.extname(
+            extractOriginalName(entry.name)
+          ).toLowerCase();
+
+        if (
+          !ALLOWED_DOCUMENT_EXTENSIONS.has(
+            extension
+          )
+        ) {
+          continue;
+        }
+
+        const fullPath =
+          path.join(directory, entry.name);
+
+        const stats =
+          await fs.promises.stat(fullPath);
+
+        documents.push(
+          documentToResponse({
+            filename: entry.name,
+            size: stats.size,
+            mimetype:
+              getDocumentMimeType(entry.name),
+            birthtime: stats.birthtime,
+            mtime: stats.mtime,
+          })
+        );
+      }
+
+      documents.sort(
+        (a, b) =>
+          new Date(b.uploadedAt) -
+          new Date(a.uploadedAt)
+      );
+
+      return res.json({
+        success: true,
+        count: documents.length,
+        documents,
+      });
+    } catch (error) {
+      console.error(
+        "List private documents error:",
+        error
+      );
+
+      return res.status(500).json({
+        success: false,
+        error: "Unable to load documents.",
+      });
+    }
+  }
+);
+
+router.post(
+  "/documents",
+  authMiddleware,
+  documentUpload.array(
+    "documents",
+    DOCUMENT_MAX_FILES_PER_UPLOAD
+  ),
+  async (req, res) => {
+    const files = req.files || [];
+
+    if (!files.length) {
+      return res.status(400).json({
+        success: false,
+        error:
+          "Please select at least one document.",
+      });
+    }
+
+    const documents = files.map((file) =>
+      documentToResponse({
+        filename: file.filename,
+        size: file.size,
+        mimetype: file.mimetype,
+        birthtime: new Date(),
+        mtime: new Date(),
+      })
+    );
+
+    return res.status(201).json({
+      success: true,
+      message:
+        `${documents.length} document${
+          documents.length === 1 ? "" : "s"
+        } uploaded successfully.`,
+      documents,
+    });
+  }
+);
+
+router.get(
+  "/documents/:filename/download",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const filename =
+        String(req.params.filename || "");
+
+      if (!validateStoredFilename(filename)) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid document filename.",
+        });
+      }
+
+      const directory =
+        getUserDocumentDirectory(req.user.id);
+
+      const filePath =
+        path.join(directory, filename);
+
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({
+          success: false,
+          error: "Document not found.",
+        });
+      }
+
+      const originalName =
+        extractOriginalName(filename);
+
+      const extension =
+        path.extname(
+          originalName
+        ).toLowerCase();
+
+      if (
+        !ALLOWED_DOCUMENT_EXTENSIONS.has(
+          extension
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid document type.",
+        });
+      }
+
+      res.setHeader(
+        "Cache-Control",
+        "private, no-store"
+      );
+
+      res.type(
+        getDocumentMimeType(originalName)
+      );
+
+      return res.download(
+        filePath,
+        originalName
+      );
+    } catch (error) {
+      console.error(
+        "Download private document error:",
+        error
+      );
+
+      if (!res.headersSent) {
+        return res.status(500).json({
+          success: false,
+          error: "Unable to download document.",
+        });
+      }
+    }
+  }
+);
+
+router.delete(
+  "/documents/:filename",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const filename =
+        String(req.params.filename || "");
+
+      if (!validateStoredFilename(filename)) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid document filename.",
+        });
+      }
+
+      const directory =
+        getUserDocumentDirectory(req.user.id);
+
+      const filePath =
+        path.join(directory, filename);
+
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({
+          success: false,
+          error: "Document not found.",
+        });
+      }
+
+      const originalName =
+        extractOriginalName(filename);
+
+      const extension =
+        path.extname(
+          originalName
+        ).toLowerCase();
+
+      if (
+        !ALLOWED_DOCUMENT_EXTENSIONS.has(
+          extension
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid document type.",
+        });
+      }
+
+      await fs.promises.unlink(filePath);
+
+      return res.json({
+        success: true,
+        message:
+          "Document deleted successfully.",
+        filename: originalName,
+        storedFilename: filename,
+      });
+    } catch (error) {
+      console.error(
+        "Delete private document error:",
+        error
+      );
+
+      return res.status(500).json({
+        success: false,
+        error: "Unable to delete document.",
       });
     }
   }
