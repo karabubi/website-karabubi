@@ -200,6 +200,12 @@ const Private = () => {
   const [deletingDocument, setDeletingDocument] =
     useState(null);
 
+  const [editingDocument, setEditingDocument] =
+    useState(null);
+
+  const [documentRenameValue, setDocumentRenameValue] =
+    useState("");
+
   const [documentActionLoading, setDocumentActionLoading] =
     useState(false);
 
@@ -666,6 +672,103 @@ const Private = () => {
         err.message ||
         t.private.documentDownloadError
       );
+    }
+  }
+
+  function openDocumentRename(documentFile) {
+    setEditingDocument(documentFile);
+    setDocumentRenameValue(documentFile.filename || "");
+    setDeletingDocument(null);
+    setError("");
+  }
+
+  function closeDocumentRename() {
+    if (documentActionLoading) {
+      return;
+    }
+
+    setEditingDocument(null);
+    setDocumentRenameValue("");
+  }
+
+  async function renameDocument() {
+    if (!editingDocument) {
+      return;
+    }
+
+    const nextName =
+      documentRenameValue.trim();
+
+    if (!nextName) {
+      setError(
+        t.private.documentNameRequired
+      );
+      return;
+    }
+
+    const currentExtension =
+      editingDocument.filename
+        .slice(
+          editingDocument.filename.lastIndexOf(".")
+        )
+        .toLowerCase();
+
+    const nextExtension =
+      nextName.includes(".")
+        ? nextName
+            .slice(nextName.lastIndexOf("."))
+            .toLowerCase()
+        : "";
+
+    if (
+      !currentExtension ||
+      nextExtension !== currentExtension
+    ) {
+      setError(
+        t.private.documentExtensionLocked
+      );
+      return;
+    }
+
+    setDocumentActionLoading(true);
+    setError("");
+
+    try {
+      const response =
+        await privateFetch(
+          `/private/documents/${encodeURIComponent(
+            editingDocument.storedFilename
+          )}/rename`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              filename: nextName,
+            }),
+          }
+        );
+
+      const body =
+        await response.json();
+
+      setMessage(
+        body.message ||
+        t.private.documentRenameSuccess
+      );
+
+      setEditingDocument(null);
+      setDocumentRenameValue("");
+
+      await loadDocuments();
+    } catch (err) {
+      setError(
+        err.message ||
+        t.private.documentRenameError
+      );
+    } finally {
+      setDocumentActionLoading(false);
     }
   }
 
@@ -1172,6 +1275,18 @@ const Private = () => {
                       <div className="private-document-actions">
                         <button
                           type="button"
+                          className="private-document-edit"
+                          onClick={() =>
+                            openDocumentRename(
+                              documentFile
+                            )
+                          }
+                        >
+                          ✎ {t.private.renameDocument}
+                        </button>
+
+                        <button
+                          type="button"
                           onClick={() =>
                             downloadDocument(
                               documentFile
@@ -1617,6 +1732,90 @@ const Private = () => {
                   onClick={renamePhoto}
                 >
                   {photoActionLoading
+                    ? t.private.saving
+                    : t.private.saveChanges}
+                </button>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {editingDocument && (
+          <div
+            className="private-photo-modal-backdrop"
+            role="presentation"
+            onMouseDown={(event) => {
+              if (
+                event.currentTarget === event.target &&
+                !documentActionLoading
+              ) {
+                closeDocumentRename();
+              }
+            }}
+          >
+            <section
+              className="private-photo-modal private-document-rename-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="rename-document-title"
+            >
+              <span className="private-modal-eyebrow">
+                {t.private.renameDocument}
+              </span>
+
+              <h2 id="rename-document-title">
+                {t.private.renameDocumentTitle}
+              </h2>
+
+              <p className="private-document-rename-help">
+                {t.private.renameDocumentHelp}
+              </p>
+
+              <label className="private-document-rename-field">
+                <span>
+                  {t.private.documentName}
+                </span>
+
+                <input
+                  type="text"
+                  value={documentRenameValue}
+                  disabled={documentActionLoading}
+                  autoFocus
+                  onChange={(event) =>
+                    setDocumentRenameValue(
+                      event.target.value
+                    )
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      renameDocument();
+                    }
+
+                    if (event.key === "Escape") {
+                      closeDocumentRename();
+                    }
+                  }}
+                />
+              </label>
+
+              <div className="private-modal-actions">
+                <button
+                  type="button"
+                  className="private-modal-cancel"
+                  disabled={documentActionLoading}
+                  onClick={closeDocumentRename}
+                >
+                  {t.private.cancel}
+                </button>
+
+                <button
+                  type="button"
+                  className="private-modal-save"
+                  disabled={documentActionLoading}
+                  onClick={renameDocument}
+                >
+                  {documentActionLoading
                     ? t.private.saving
                     : t.private.saveChanges}
                 </button>

@@ -4189,3 +4189,103 @@ html[dir="rtl"] .private-document-info {
     width: 100%;
   }
 }
+
+/* ==================================================
+   PRIVATE DOCUMENT RENAME
+   ================================================== */
+
+.private-document-edit {
+  border-color: rgba(96, 165, 250, 0.26) !important;
+  color: #93c5fd !important;
+}
+
+.private-document-edit:hover {
+  border-color: rgba(96, 165, 250, 0.5) !important;
+  background: rgba(30, 64, 175, 0.16) !important;
+}
+
+.private-document-rename-modal {
+  max-width: 560px;
+}
+
+.private-document-rename-help {
+  margin: 8px 0 20px;
+  color: rgba(203, 213, 225, 0.72);
+  line-height: 1.6;
+}
+
+.private-document-rename-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.private-document-rename-field > span {
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.private-document-rename-field input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 13px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 12px;
+  outline: none;
+  background: rgba(15, 23, 42, 0.72);
+  color: #f8fafc;
+  font: inherit;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.private-document-rename-field input:focus {
+  border-color: rgba(96, 165, 250, 0.7);
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.12);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.private-modal-save {
+  min-height: 42px;
+  padding: 9px 16px;
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  border-radius: 11px;
+  background: rgba(37, 99, 235, 0.18);
+  color: #bfdbfe;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.private-modal-save:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.28);
+}
+
+.private-modal-save:disabled,
+.private-document-rename-field input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+html[dir="rtl"] .private-document-rename-field {
+  text-align: right;
+}
+
+html[dir="rtl"] .private-document-rename-field input {
+  text-align: right;
+}
+
+@media (max-width: 480px) {
+  .private-document-rename-modal {
+    width: calc(100vw - 28px);
+  }
+
+  .private-document-rename-field input {
+    font-size: 16px;
+  }
+}

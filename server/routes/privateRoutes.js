@@ -559,6 +559,166 @@ router.get(
   }
 );
 
+router.patch(
+  "/documents/:filename/rename",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const filename =
+        String(req.params.filename || "");
+
+      if (!validateStoredFilename(filename)) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid document filename.",
+        });
+      }
+
+      const requestedName =
+        String(req.body?.filename || "").trim();
+
+      if (!requestedName) {
+        return res.status(400).json({
+          success: false,
+          error: "New document filename is required.",
+        });
+      }
+
+      if (
+        requestedName !== path.basename(requestedName) ||
+        requestedName.includes("..") ||
+        requestedName.includes("/") ||
+        requestedName.includes("\\")
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid new document filename.",
+        });
+      }
+
+      const currentOriginalName =
+        extractOriginalName(filename);
+
+      const currentExtension =
+        path.extname(currentOriginalName).toLowerCase();
+
+      const requestedExtension =
+        path.extname(requestedName).toLowerCase();
+
+      if (
+        !ALLOWED_DOCUMENT_EXTENSIONS.has(
+          currentExtension
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid current document type.",
+        });
+      }
+
+      if (
+        !ALLOWED_DOCUMENT_EXTENSIONS.has(
+          requestedExtension
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid new document type.",
+        });
+      }
+
+      if (
+        requestedExtension !== currentExtension
+      ) {
+        return res.status(400).json({
+          success: false,
+          error:
+            "Changing the document file extension is not allowed.",
+        });
+      }
+
+      const sanitizedNewName =
+        sanitizeOriginalName(requestedName);
+
+      if (
+        path.extname(
+          sanitizedNewName
+        ).toLowerCase() !== currentExtension
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid renamed document.",
+        });
+      }
+
+      const directory =
+        getUserDocumentDirectory(req.user.id);
+
+      const oldPath =
+        path.join(directory, filename);
+
+      if (!fs.existsSync(oldPath)) {
+        return res.status(404).json({
+          success: false,
+          error: "Document not found.",
+        });
+      }
+
+      const newStoredFilename =
+        storedFilename(sanitizedNewName);
+
+      const newPath =
+        path.join(
+          directory,
+          newStoredFilename
+        );
+
+      if (fs.existsSync(newPath)) {
+        return res.status(409).json({
+          success: false,
+          error:
+            "A document with that filename already exists.",
+        });
+      }
+
+      await fs.promises.rename(
+        oldPath,
+        newPath
+      );
+
+      const stats =
+        await fs.promises.stat(newPath);
+
+      return res.json({
+        success: true,
+        message:
+          "Document renamed successfully.",
+        document:
+          documentToResponse({
+            filename: newStoredFilename,
+            size: stats.size,
+            mimetype:
+              getDocumentMimeType(
+                sanitizedNewName
+              ),
+            birthtime: stats.birthtime,
+            mtime: stats.mtime,
+          }),
+      });
+    } catch (error) {
+      console.error(
+        "Rename private document error:",
+        error
+      );
+
+      return res.status(500).json({
+        success: false,
+        error: "Unable to rename document.",
+      });
+    }
+  }
+);
+
 router.delete(
   "/documents/:filename",
   authMiddleware,
