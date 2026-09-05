@@ -1,21 +1,26 @@
 const jwt = require("jsonwebtoken");
 
+const AUTH_COOKIE_NAME = "websiteKarabubiSession";
+
 const authMiddleware = (req, res, next) => {
-  const authorization = req.headers.authorization || "";
+  const authorization =
+    req.headers.authorization || "";
 
-  if (!authorization.startsWith("Bearer ")) {
-    return res.status(401).json({
-      success: false,
-      error: "Authentication required.",
-    });
-  }
+  const bearerToken =
+    authorization.startsWith("Bearer ")
+      ? authorization.slice(7).trim()
+      : "";
 
-  const token = authorization.slice(7).trim();
+  const cookieToken =
+    req.cookies?.[AUTH_COOKIE_NAME] || "";
+
+  const token =
+    cookieToken || bearerToken;
 
   if (!token) {
     return res.status(401).json({
       success: false,
-      error: "Authentication token is missing.",
+      error: "Authentication required.",
     });
   }
 
@@ -31,7 +36,8 @@ const authMiddleware = (req, res, next) => {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      error: "Invalid or expired authentication token.",
+      error:
+        "Invalid or expired authentication token.",
     });
   }
 };

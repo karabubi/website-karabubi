@@ -25,6 +25,7 @@ const request = async (
     `${API_URL}${path}`,
     {
       ...options,
+      credentials: "include",
       headers,
     }
   );
@@ -67,6 +68,11 @@ export const login = (payload) =>
 
 export const getCurrentUser = () =>
   request("/auth/me");
+
+export const logout = () =>
+  request("/auth/logout", {
+    method: "POST",
+  });
 
 export const getPrivateDashboard = () =>
   request("/private/dashboard");

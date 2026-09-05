@@ -9,6 +9,7 @@ import {
   getCurrentUser,
   login as loginRequest,
   register as registerRequest,
+  logout as logoutRequest,
 } from "../api";
 
 const AuthContext =
@@ -93,12 +94,16 @@ export const AuthProvider = ({
     return response;
   };
 
-  const logout = () => {
-    localStorage.removeItem(
-      TOKEN_KEY
-    );
+  const logout = async () => {
+    try {
+      await logoutRequest();
+    } finally {
+      localStorage.removeItem(
+        TOKEN_KEY
+      );
 
-    setUser(null);
+      setUser(null);
+    }
   };
 
   return (

@@ -8,6 +8,44 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+const AUTH_COOKIE_NAME =
+  "websiteKarabubiSession";
+
+const AUTH_COOKIE_MAX_AGE =
+  2 * 60 * 60 * 1000;
+
+const authCookieOptions = () => ({
+  httpOnly: true,
+  secure:
+    process.env.NODE_ENV === "production",
+  sameSite:
+    process.env.NODE_ENV === "production"
+      ? "none"
+      : "lax",
+  maxAge: AUTH_COOKIE_MAX_AGE,
+  path: "/",
+});
+
+const setAuthCookie = (res, token) => {
+  res.cookie(
+    AUTH_COOKIE_NAME,
+    token,
+    authCookieOptions()
+  );
+};
+
+const clearAuthCookie = (res) => {
+  const {
+    maxAge,
+    ...options
+  } = authCookieOptions();
+
+  res.clearCookie(
+    AUTH_COOKIE_NAME,
+    options
+  );
+};
+
 const createToken = (user) => {
   return jwt.sign(
     {
@@ -130,6 +168,8 @@ router.post("/register", async (req, res) => {
 
     const token = createToken(user);
 
+    setAuthCookie(res, token);
+
     return res.status(201).json({
       success: true,
       message: "Account created successfully.",
@@ -203,6 +243,8 @@ router.post("/login", async (req, res) => {
 
     const token = createToken(user);
 
+    setAuthCookie(res, token);
+
     return res.json({
       success: true,
       token,
@@ -217,6 +259,17 @@ router.post("/login", async (req, res) => {
     });
   }
 });
+
+router.post(
+  "/logout",
+  (req, res) => {
+    clearAuthCookie(res);
+
+    return res.json({
+      success: true,
+    });
+  }
+);
 
 router.get(
   "/me",

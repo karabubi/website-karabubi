@@ -96,6 +96,7 @@ async function privateFetch(
     `${API_URL}${endpoint}`,
     {
       ...options,
+      credentials: "include",
       headers,
     }
   );
