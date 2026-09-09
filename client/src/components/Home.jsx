@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import React from "react";
 import { Link } from "react-router-dom";
+import { getVisitorStats, recordSiteVisit } from "../api";
 import { useLanguage } from "../context/LanguageContext";
 
 function ArrowIcon() {
@@ -66,7 +68,79 @@ function getFocusItems(t) {
 }
 
 function Home() {
-  const { t } = useLanguage();
+
+  const [visitorStats, setVisitorStats] = useState(null);
+  const [currentDateTime, setCurrentDateTime] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadVisitorCounter = async () => {
+      try {
+        const storageKey = "websiteKarabubiVisitorId";
+
+        let visitorId =
+          localStorage.getItem(storageKey);
+
+        if (!visitorId) {
+          visitorId =
+            typeof crypto !== "undefined" &&
+            typeof crypto.randomUUID === "function"
+              ? crypto.randomUUID()
+              : `${Date.now()}-${Math.random()
+                  .toString(36)
+                  .slice(2)}-${Math.random()
+                  .toString(36)
+                  .slice(2)}`;
+
+          localStorage.setItem(
+            storageKey,
+            visitorId
+          );
+        }
+
+        await recordSiteVisit({
+          visitorId,
+          path: window.location.pathname,
+        });
+
+        const stats = await getVisitorStats();
+
+        if (active) {
+          setVisitorStats(stats);
+        }
+      } catch (error) {
+        console.error(
+          "Visitor counter error:",
+          error
+        );
+      }
+    };
+
+    loadVisitorCounter();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+
+  const { t, language } = useLanguage();
+  const homeLocale =
+    language === "de"
+      ? "de-DE"
+      : language === "ar"
+        ? "ar"
+        : "en-US";
+
   const focusItems = getFocusItems(t);
 
   return (
@@ -182,8 +256,56 @@ function Home() {
           </div>
 
           <div className="home-panel-footer">
-            <span>
-              {t.home.modernWebApplications}
+            {visitorStats && (
+              <div
+                className="home-visitor-counter"
+                aria-label={t.home.analyticsAria}
+              >
+                <div className="home-visitor-counter-heading">
+                  <span aria-hidden="true">●</span>
+                  <span>{t.home.visitorAnalytics}</span>
+                </div>
+
+                <div className="home-visitor-counter-main">
+                  <span className="home-visitor-counter-label">
+                    {t.home.visitors}
+                  </span>
+
+                  <strong>
+                    {Number(
+                      visitorStats.uniqueVisitors || 0
+                    ).toLocaleString(homeLocale)}
+                  </strong>
+                </div>
+
+                <time
+                  className="home-visitor-counter-date"
+                  dateTime={currentDateTime.toISOString()}
+                >
+                  {new Intl.DateTimeFormat(homeLocale, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  }).format(currentDateTime)}
+                  {" · "}
+                  {new Intl.DateTimeFormat(homeLocale, {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false,
+                  }).format(currentDateTime)}
+                </time>
+              </div>
+            )}
+
+            <span className="home-panel-footer-copy">
+              {t.home.modernApplications}
+              <span className="home-panel-footer-separator">
+                {" · "}
+              </span>
+              <span className="home-panel-footer-action">
+                {t.home.buildLearnCreate}
+              </span>
             </span>
 
             <span className="home-panel-footer-mark">

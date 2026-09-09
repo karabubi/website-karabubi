@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const db = require('./db');
 const authRoutes = require('./routes/authRoutes');
 const privateRoutes = require('./routes/privateRoutes');
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -55,6 +56,7 @@ app.get('/api/health', (req, res) => {
 // Routen
 app.use('/api/auth', authRoutes);
 app.use('/api/private', privateRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // Fehlerbehandlung
 app.use((err, req, res, next) => {

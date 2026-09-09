@@ -182,6 +182,24 @@ const de = {
   },
 
   home: {
+
+
+    visitorAnalytics: "Besucherstatistik",
+
+
+    visitors: "Besucher",
+
+
+    live: "Live",
+
+
+    analyticsAria: "Website-Besucherstatistik",
+
+
+    modernApplications: "Moderne Full-Stack-Anwendungen",
+
+
+    buildLearnCreate: "Entwickeln · Lernen · Erstellen",
     available: "Verfügbar für Webentwicklung",
     name: "Saleh Alkarabubi",
     titleMain: "Full-Stack",

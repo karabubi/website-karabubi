@@ -182,6 +182,24 @@ const ar = {
   },
 
   home: {
+
+
+    visitorAnalytics: "إحصائيات الزوار",
+
+
+    visitors: "الزوار",
+
+
+    live: "مباشر",
+
+
+    analyticsAria: "إحصائيات زوار الموقع",
+
+
+    modernApplications: "تطبيقات Full-Stack حديثة",
+
+
+    buildLearnCreate: "تطوير · تعلم · إنشاء",
     available: "متاح لتطوير مواقع الويب",
     name: "صالح الكرابوبي",
     titleMain: "Full-Stack",

@@ -54,6 +54,15 @@ const request = async (
   return data;
 };
 
+export const recordSiteVisit = (payload) =>
+  request("/analytics/visit", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const getVisitorStats = () =>
+  request("/analytics/stats");
+
 export const register = (payload) =>
   request("/auth/register", {
     method: "POST",
