@@ -79,3 +79,4 @@ server/.env.*
 # Private runtime document storage
 server/storage/private-documents/*
 !server/storage/private-documents/.gitkeep
+.vercel
