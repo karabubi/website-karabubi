@@ -101,7 +101,7 @@ function ExternalLinkIcon() {
     <svg
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className="projects-action-icon"
+      className="h-[17px] w-[17px] basis-[17px] shrink-0"
     >
       <path
         fill="currentColor"
@@ -116,7 +116,7 @@ function GitHubIcon() {
     <svg
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className="projects-action-icon"
+      className="h-[17px] w-[17px] basis-[17px] shrink-0"
     >
       <path
         fill="currentColor"
@@ -131,7 +131,7 @@ function LinkedInIcon() {
     <svg
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className="projects-action-icon"
+      className="h-[17px] w-[17px] basis-[17px] shrink-0"
     >
       <path
         fill="currentColor"
@@ -146,7 +146,7 @@ function CodeIcon() {
     <svg
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className="project-code-icon"
+      className="h-[22px] w-[22px]"
     >
       <path
         fill="none"
@@ -243,12 +243,12 @@ function Photos() {
   }, [repositories]);
 
   return (
-    <main className="projects-modern-page">
-      <section className="projects-modern-shell">
+    <main className="min-h-[calc(100vh-88px)] px-7 pb-[110px] pt-[72px] text-slate-50 max-[700px]:px-[18px] max-[700px]:pb-[75px] max-[700px]:pt-[50px]">
+      <section className="mx-auto w-[min(1240px,100%)]">
 
-        <header className="projects-modern-hero">
-          <div className="projects-modern-intro">
-            <span className="projects-modern-kicker">
+        <header className="grid grid-cols-[minmax(0,1.6fr)_minmax(270px,0.55fr)] items-end gap-[42px] max-[900px]:grid-cols-1">
+          <div className="max-w-[820px] [&>h1]:my-0 [&>h1]:mb-5 [&>h1]:mt-[17px] [&>h1]:max-w-[800px] [&>h1]:text-[clamp(3rem,7vw,5.7rem)] [&>h1]:leading-[0.98] [&>h1]:tracking-[-0.06em] [&>h1]:text-slate-50 [&>h1>span]:text-[#7395c7] [&>p]:m-0 [&>p]:max-w-[710px] [&>p]:text-[1.06rem] [&>p]:leading-[1.8] [&>p]:text-slate-400 max-[700px]:[&>h1]:text-[clamp(2.7rem,13vw,4.3rem)]">
+            <span className="inline-flex items-center gap-[9px] text-[0.74rem] font-extrabold tracking-[0.16em] text-blue-400 before:h-px before:w-7 before:bg-blue-400 before:content-['']">
               {t.projects.kicker}
             </span>
 
@@ -259,10 +259,10 @@ function Photos() {
 
             <p>{t.projects.intro}</p>
 
-            <div className="projects-modern-actions">
+            <div className="mt-[30px] flex flex-wrap gap-[11px] max-[700px]:grid max-[700px]:grid-cols-1">
               <a
                 href="/profiles/github.html"
-                className="projects-profile-button"
+                className="inline-flex min-h-12 items-center gap-[9px] rounded-[13px] border border-[rgba(148,163,184,0.2)] bg-[rgba(15,23,42,0.68)] px-[17px] text-[0.9rem] font-[750] text-slate-50 no-underline transition-[transform,border-color,background] duration-[180ms] ease-out hover:-translate-y-0.5 hover:border-[rgba(96,165,250,0.55)] hover:bg-[rgba(30,41,59,0.84)] max-[700px]:justify-center"
               >
                 <GitHubIcon />
                 <span>{t.projects.githubProfile}</span>
@@ -271,7 +271,7 @@ function Photos() {
 
               <a
                 href="/profiles/linkedin.html"
-                className="projects-profile-button projects-linkedin-button"
+                className="inline-flex min-h-12 items-center gap-[9px] rounded-[13px] border border-[rgba(56,189,248,0.24)] bg-[rgba(15,23,42,0.68)] px-[17px] text-[0.9rem] font-[750] text-slate-50 no-underline transition-[transform,border-color,background] duration-[180ms] ease-out hover:-translate-y-0.5 hover:border-[rgba(96,165,250,0.55)] hover:bg-[rgba(30,41,59,0.84)] max-[700px]:justify-center"
               >
                 <LinkedInIcon />
                 <span>{t.projects.linkedinProfile}</span>
@@ -280,15 +280,15 @@ function Photos() {
 
               <a
                 href="/"
-                className="projects-home-button"
+                className="inline-flex min-h-12 items-center gap-[9px] rounded-[13px] border border-[rgba(148,163,184,0.2)] bg-[rgba(15,23,42,0.68)] px-[17px] text-[0.9rem] font-[750] text-[#a9b7cb] no-underline transition-[transform,border-color,background] duration-[180ms] ease-out hover:-translate-y-0.5 hover:border-[rgba(96,165,250,0.55)] hover:bg-[rgba(30,41,59,0.84)] max-[700px]:justify-center"
               >
                 ← {t.projects.home}
               </a>
             </div>
           </div>
 
-          <aside className="projects-summary-card">
-            <span className="projects-summary-label">
+          <aside className="flex min-h-[250px] flex-col justify-center rounded-3xl border border-[rgba(148,163,184,0.14)] bg-[linear-gradient(145deg,rgba(17,28,48,0.9),rgba(7,14,27,0.92))] p-7 shadow-[0_30px_70px_rgba(0,0,0,0.2),inset_0_1px_rgba(255,255,255,0.03)] [&>strong]:mt-2 [&>strong]:text-[4.7rem] [&>strong]:leading-none [&>strong]:tracking-[-0.06em] [&>strong]:text-slate-50 max-[900px]:min-h-0">
+            <span className="text-[0.7rem] font-extrabold tracking-[0.13em] text-[#6f88aa]">
               {t.projects.publicWork}
             </span>
 
@@ -296,13 +296,13 @@ function Photos() {
               {loading ? "—" : repositories.length}
             </strong>
 
-            <span>
+            <span className="mt-[5px] text-[#8a9bb2]">
               {t.projects.githubProjects}
             </span>
 
-            <div className="projects-summary-divider" />
+            <div className="my-6 h-px bg-[rgba(148,163,184,0.13)]" />
 
-            <div className="projects-summary-meta">
+            <div className="grid grid-cols-2 gap-[15px] [&>div]:flex [&>div]:flex-col [&>div]:gap-1 [&_strong]:text-[0.92rem] [&_strong]:text-blue-100 [&_span]:text-[0.73rem] [&_span]:text-[#63748a]">
               <div>
                 <strong>
                   {loading ? "—" : languageCount}
@@ -318,8 +318,8 @@ function Photos() {
           </aside>
         </header>
 
-        <section className="projects-work-section">
-          <div className="projects-section-heading">
+        <section className="mt-[92px]">
+          <div className="mb-[25px] flex items-end justify-between gap-5 [&_h2]:mb-0 [&_h2]:mt-1.5 [&_h2]:text-[clamp(2rem,4vw,3rem)] [&_h2]:tracking-[-0.04em] [&_h2]:text-slate-50 [&_span]:text-[0.7rem] [&_span]:font-extrabold [&_span]:tracking-[0.15em] [&_span]:text-blue-400 [&>p]:m-0 [&>p]:text-[0.83rem] [&>p]:text-slate-500 max-[700px]:flex-col max-[700px]:items-start">
             <div>
               <span>{t.projects.allProjects}</span>
               <h2>{t.projects.repositories}</h2>
@@ -333,14 +333,14 @@ function Photos() {
           </div>
 
           {loading && (
-            <div className="projects-loading">
-              <span className="projects-loading-dot" />
+            <div className="flex min-h-[150px] items-center justify-center gap-[11px] rounded-[20px] border border-[rgba(148,163,184,0.13)] bg-[rgba(15,23,42,0.55)] p-[30px] text-[#8493a8]">
+              <span className="h-[9px] w-[9px] rounded-full bg-blue-400 animate-[projectsPulse_1.2s_infinite_ease-in-out]" />
               {t.projects.loading}
             </div>
           )}
 
           {loadError && (
-            <div className="projects-error">
+            <div className="flex min-h-[150px] flex-col items-center justify-center gap-[11px] rounded-[20px] border border-[rgba(148,163,184,0.13)] bg-[rgba(15,23,42,0.55)] p-[30px] text-[#8493a8] [&>strong]:text-blue-100">
               <strong>
                 {t.projects.loadError}
               </strong>
@@ -354,7 +354,7 @@ function Photos() {
           {!loading &&
             !loadError &&
             repositories.length === 0 && (
-              <div className="projects-error">
+              <div className="flex min-h-[150px] flex-col items-center justify-center gap-[11px] rounded-[20px] border border-[rgba(148,163,184,0.13)] bg-[rgba(15,23,42,0.55)] p-[30px] text-[#8493a8] [&>strong]:text-blue-100">
                 {t.projects.noRepositories}
               </div>
             )}
@@ -362,23 +362,23 @@ function Photos() {
           {!loading &&
             !loadError &&
             repositories.length > 0 && (
-              <div className="projects-modern-grid">
+              <div className="grid grid-cols-2 gap-[17px] max-[700px]:grid-cols-1">
                 {repositories.map((repo, index) => (
                   <article
-                    className="projects-modern-card"
+                    className="relative flex min-h-[330px] flex-col overflow-hidden rounded-[21px] border border-[rgba(148,163,184,0.13)] bg-[linear-gradient(145deg,rgba(15,25,44,0.82),rgba(6,13,27,0.88))] p-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.12)] transition-[transform,border-color,box-shadow] duration-[220ms] ease-out after:pointer-events-none after:absolute after:right-0 after:top-0 after:h-[150px] after:w-[150px] after:translate-x-[45%] after:-translate-y-[45%] after:rounded-full after:bg-[rgba(59,130,246,0.06)] after:blur-[45px] after:content-[''] hover:-translate-y-[5px] hover:border-[rgba(96,165,250,0.34)] hover:shadow-[0_27px_65px_rgba(0,0,0,0.22)]"
                     key={repo.id}
                   >
-                    <div className="project-modern-top">
-                      <div className="project-modern-icon">
+                    <div className="flex items-center justify-between">
+                      <div className="grid h-[43px] w-[43px] place-items-center rounded-xl border border-[rgba(96,165,250,0.16)] bg-[rgba(59,130,246,0.08)] text-[#7db4ff]">
                         <CodeIcon />
                       </div>
 
-                      <span className="project-modern-number">
+                      <span className="text-[0.76rem] font-extrabold tracking-[0.1em] text-[#3f526a]">
                         {String(index + 1).padStart(2, "0")}
                       </span>
                     </div>
 
-                    <div className="project-modern-content">
+                    <div className="mt-7 [&>h3]:m-0 [&>h3]:break-words [&>h3]:text-[1.3rem] [&>h3]:leading-[1.35] [&>h3]:tracking-[-0.025em] [&>h3]:text-slate-100 [&>p]:mb-0 [&>p]:mt-3 [&>p]:text-[0.9rem] [&>p]:leading-[1.7] [&>p]:text-[#8291a6]">
                       <h3>{repo.name}</h3>
 
                       <p>
@@ -386,10 +386,10 @@ function Photos() {
                       </p>
                     </div>
 
-                    <div className="project-modern-details">
+                    <div className="mt-[22px] flex flex-wrap gap-[14px] text-[0.74rem] text-[#607086]">
                       {repo.language && (
-                        <span className="project-language">
-                          <span className="project-language-dot" />
+                        <span className="inline-flex items-center gap-[7px]">
+                          <span className="h-[7px] w-[7px] rounded-full bg-blue-400" />
                           {repo.language}
                         </span>
                       )}
@@ -403,13 +403,13 @@ function Photos() {
 
                     {getProjectTechnologies(repo).length > 0 && (
                       <div
-                        className="project-tech-list"
+                        className="mt-[14px] flex flex-wrap gap-[7px] rtl:[direction:rtl] max-[640px]:mt-3 max-[640px]:gap-1.5"
                         aria-label="Project technologies"
                       >
                         {getProjectTechnologies(repo).map(
                           (technology) => (
                             <span
-                              className="project-tech-badge"
+                              className="inline-flex min-h-7 items-center whitespace-nowrap rounded-full border border-[rgba(96,165,250,0.2)] bg-[rgba(30,41,59,0.62)] px-2.5 py-[5px] text-[0.76rem] font-bold leading-none text-slate-300 max-[640px]:px-[9px] max-[640px]:text-[0.72rem]"
                               key={technology}
                             >
                               {technology}
@@ -419,8 +419,8 @@ function Photos() {
                       </div>
                     )}
 
-                    <div className="project-modern-footer">
-                      <div className="project-modern-stats">
+                    <div className="mt-auto flex items-center justify-between gap-4 border-t border-[rgba(148,163,184,0.1)] pt-6 max-[700px]:flex-col max-[700px]:items-start max-[640px]:items-stretch">
+                      <div className="flex gap-3 text-[0.72rem] text-[#53657b]">
                         <span>
                           ☆ {repo.stargazers_count} {t.projects.stars}
                         </span>
@@ -430,12 +430,12 @@ function Photos() {
                         </span>
                       </div>
 
-                      <div className="project-card-actions">
+                      <div className="flex flex-wrap items-center gap-2.5 rtl:[direction:rtl] max-[640px]:w-full max-[420px]:flex-col max-[420px]:items-stretch">
                         <a
                           href={repo.html_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="project-repository-link"
+                          className="inline-flex min-h-10 flex-auto items-center justify-center gap-[7px] whitespace-nowrap rounded-[10px] px-[13px] py-[9px] text-[0.79rem] font-bold leading-[1.2] text-[#8fbdff] no-underline transition-[transform,border-color,background-color,color] duration-160 hover:text-blue-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-current max-[640px]:basis-[150px] max-[640px]:grow max-[420px]:w-full max-[420px]:basis-auto max-[420px]:grow-0"
                         >
                           <GitHubIcon />
                           {t.projects.viewRepository}
@@ -446,7 +446,7 @@ function Photos() {
                             href={getLiveDemoUrl(repo)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="project-live-link"
+                            className="inline-flex min-h-10 flex-initial items-center justify-center gap-[7px] whitespace-nowrap rounded-[10px] border border-[rgba(148,163,184,0.28)] bg-[rgba(15,23,42,0.5)] px-[13px] py-[9px] text-[0.79rem] font-bold leading-[1.2] text-slate-200 no-underline transition-[transform,border-color,background-color,color] duration-160 hover:-translate-y-px hover:border-[rgba(148,163,184,0.55)] hover:bg-[rgba(30,41,59,0.78)] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-current max-[640px]:basis-[150px] max-[640px]:grow max-[420px]:w-full max-[420px]:basis-auto max-[420px]:grow-0"
                           >
                             <ExternalLinkIcon />
                             {t.projects.liveDemo}
