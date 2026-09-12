@@ -5,6 +5,7 @@ const { Op } = require("sequelize");
 
 const { User } = require("../models");
 const authMiddleware = require("../middleware/authMiddleware");
+const adminMiddleware = require("../middleware/adminMiddleware");
 
 const router = express.Router();
 
@@ -66,9 +67,14 @@ const publicUser = (user) => ({
   username: user.username,
   email: user.email,
   isVerified: user.isVerified,
+  role: user.role,
 });
 
-router.post("/register", async (req, res) => {
+router.post(
+  "/register",
+  authMiddleware,
+  adminMiddleware,
+  async (req, res) => {
   try {
     let {
       name,
@@ -166,14 +172,9 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
     });
 
-    const token = createToken(user);
-
-    setAuthCookie(res, token);
-
     return res.status(201).json({
       success: true,
       message: "Account created successfully.",
-      token,
       user: publicUser(user),
     });
   } catch (error) {

@@ -3,7 +3,6 @@ import {
 } from "react";
 
 import {
-  Link,
   useNavigate,
 } from "react-router-dom";
 
@@ -139,15 +138,6 @@ const Login = () => {
           </button>
         </form>
 
-        <p className="mt-6 text-center">
-          {t.login.newHere}{" "}
-          <Link
-            to="/register"
-            className="font-semibold text-blue-400 hover:text-blue-300"
-          >
-            {t.login.createAccount}
-          </Link>
-        </p>
 
       </section>
     </main>

@@ -25,6 +25,14 @@ const User = sequelize.define("User", {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  role: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "user",
+    validate: {
+      isIn: [["user", "admin"]],
+    },
+  },
 });
 
 module.exports = User;

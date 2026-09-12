@@ -96,6 +96,15 @@ function Navbar() {
 
           {!loading && user ? (
             <>
+              {user.role === "admin" && (
+                <Link
+                  to="/register"
+                  className="rounded-xl border border-blue-500/40 bg-blue-500/10 px-3.5 py-2.5 font-semibold text-blue-300 no-underline transition-colors hover:bg-blue-500/20 hover:text-blue-200 max-[640px]:px-2.5 max-[640px]:py-2 max-[640px]:text-[0.82rem]"
+                >
+                  Create user
+                </Link>
+              )}
+
               <Link
                 to="/private"
                 className="flex items-center gap-[11px] rounded-full border border-[#26344d] bg-[rgba(2,6,23,0.72)] py-[7px] pe-[14px] ps-[7px] no-underline transition-colors hover:border-blue-500/60 max-[640px]:p-1"
@@ -134,12 +143,6 @@ function Navbar() {
                 {t.nav.signIn}
               </NavLink>
 
-              <NavLink
-                to="/register"
-                className="rounded-[14px] bg-blue-600 px-[18px] py-3 font-bold text-white no-underline transition-colors hover:bg-blue-500 max-[640px]:whitespace-nowrap max-[640px]:px-2.5 max-[640px]:py-2 max-[640px]:text-[0.82rem] max-[420px]:px-2 max-[420px]:py-[7px] max-[420px]:text-[0.76rem]"
-              >
-                {t.nav.createAccount}
-              </NavLink>
             </>
           ) : null}
         </div>

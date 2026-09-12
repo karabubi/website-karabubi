@@ -76,22 +76,18 @@ export const AuthProvider = ({
     return response;
   };
 
-  const register = async (
+  const createUser = async (
     account
   ) => {
-    const response =
-      await registerRequest(
-        account
+    if (user?.role !== "admin") {
+      throw new Error(
+        "Administrator access required."
       );
+    }
 
-    localStorage.setItem(
-      TOKEN_KEY,
-      response.token
+    return registerRequest(
+      account
     );
-
-    setUser(response.user);
-
-    return response;
   };
 
   const logout = async () => {
@@ -113,7 +109,7 @@ export const AuthProvider = ({
         loading,
         isAuthenticated: Boolean(user),
         login,
-        register,
+        createUser,
         logout,
       }}
     >
