@@ -17,6 +17,8 @@ import {
   useAuth,
 } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
+import { readSheet } from "read-excel-file/browser";
+import mammoth from "mammoth/mammoth.browser";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -635,6 +637,483 @@ const Private = () => {
       if (documentInputRef.current) {
         documentInputRef.current.value = "";
       }
+    }
+  }
+
+  async function viewDocument(documentFile) {
+    const filename =
+      documentFile.filename || "";
+
+    const extension =
+      filename
+        .slice(filename.lastIndexOf("."))
+        .toLowerCase();
+
+    if (
+      extension === ".doc" ||
+      extension === ".xls"
+    ) {
+      setError(
+        t.private.officePreviewUnavailable
+      );
+      return;
+    }
+
+    const previewWindow =
+      window.open("", "_blank");
+
+    try {
+      const response = await privateFetch(
+        documentFile.viewUrl
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Unable to view document."
+        );
+      }
+
+      const blob = await response.blob();
+
+      const escapeHtml = (value) =>
+        String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+
+      const writePreviewDocument = (
+        title,
+        content,
+        extraStyles = ""
+      ) => {
+        if (!previewWindow) {
+          throw new Error(
+            "Unable to open preview window."
+          );
+        }
+
+        previewWindow.document.open();
+
+        previewWindow.document.write(`
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  />
+  <title>${escapeHtml(title)}</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 32px;
+      background: #0f172a;
+      color: #e5e7eb;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      font-size: 20px;
+      word-break: break-word;
+    }
+
+    .preview-container {
+      overflow: auto;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      background: #111827;
+    }
+
+    table {
+      border-collapse: collapse;
+      min-width: 100%;
+      width: max-content;
+    }
+
+    td {
+      border: 1px solid #334155;
+      padding: 8px 10px;
+      white-space: pre-wrap;
+      vertical-align: top;
+      min-width: 100px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 20px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    ${extraStyles}
+  </style>
+</head>
+
+<body>
+  <h1>${escapeHtml(title)}</h1>
+
+  <div class="preview-container">
+    ${content}
+  </div>
+</body>
+</html>
+        `);
+
+        previewWindow.document.close();
+      };
+
+      if (extension === ".docx") {
+        const arrayBuffer =
+          await blob.arrayBuffer();
+
+        const result =
+          await mammoth.convertToHtml({
+            arrayBuffer,
+          });
+
+        const parser =
+          new DOMParser();
+
+        const parsed =
+          parser.parseFromString(
+            result.value,
+            "text/html"
+          );
+
+        parsed
+          .querySelectorAll(
+            "script, iframe, object, embed, form"
+          )
+          .forEach((element) => {
+            element.remove();
+          });
+
+        parsed
+          .querySelectorAll("*")
+          .forEach((element) => {
+            for (
+              const attribute
+              of [...element.attributes]
+            ) {
+              const name =
+                attribute.name.toLowerCase();
+
+              const value =
+                attribute.value
+                  .trim()
+                  .toLowerCase();
+
+              if (
+                name.startsWith("on") ||
+                (
+                  (
+                    name === "href" ||
+                    name === "src"
+                  ) &&
+                  value.startsWith(
+                    "javascript:"
+                  )
+                )
+              ) {
+                element.removeAttribute(
+                  attribute.name
+                );
+              }
+            }
+          });
+
+        const safeDocxHtml =
+          parsed.body.innerHTML;
+
+        writePreviewDocument(
+          filename,
+          `<div class="docx-preview">
+            ${safeDocxHtml}
+          </div>`,
+          `
+            .docx-preview {
+              padding: 28px;
+              background: #ffffff;
+              color: #111827;
+              line-height: 1.6;
+              min-height: 300px;
+            }
+
+            .docx-preview p {
+              margin: 0 0 14px;
+            }
+
+            .docx-preview h1,
+            .docx-preview h2,
+            .docx-preview h3,
+            .docx-preview h4 {
+              color: #111827;
+              margin-top: 24px;
+              margin-bottom: 12px;
+            }
+
+            .docx-preview table {
+              border-collapse: collapse;
+              width: 100%;
+              margin: 16px 0;
+            }
+
+            .docx-preview td,
+            .docx-preview th {
+              border: 1px solid #cbd5e1;
+              padding: 8px 10px;
+              color: #111827;
+              background: #ffffff;
+              min-width: auto;
+            }
+
+            .docx-preview img {
+              max-width: 100%;
+              height: auto;
+            }
+
+            .docx-preview ul,
+            .docx-preview ol {
+              padding-left: 28px;
+            }
+
+            .docx-preview a {
+              color: #2563eb;
+            }
+          `
+        );
+
+        return;
+      }
+
+      if (extension === ".xlsx") {
+        const rows = await readSheet(blob);
+
+        if (!previewWindow) {
+          throw new Error(
+            "Unable to open preview window."
+          );
+        }
+
+        const formatExcelValue = (value) => {
+          if (value === null || value === undefined) {
+            return "";
+          }
+
+          if (value instanceof Date) {
+            const hours = String(
+              value.getUTCHours()
+            ).padStart(2, "0");
+
+            const minutes = String(
+              value.getUTCMinutes()
+            ).padStart(2, "0");
+
+            return `${hours}:${minutes}`;
+          }
+
+          return String(value);
+        };
+
+        const tableRows = rows
+          .map(
+            (row) =>
+              `<tr>${row
+                .map(
+                  (cell) =>
+                    `<td>${escapeHtml(
+                      formatExcelValue(cell)
+                    )}</td>`
+                )
+                .join("")}</tr>`
+          )
+          .join("");
+
+        writePreviewDocument(
+          filename,
+          `<table>${tableRows}</table>`
+        );
+
+        return;
+      }
+
+      if (extension === ".txt") {
+        const textContent =
+          await blob.text();
+
+        writePreviewDocument(
+          filename,
+          `<pre>${escapeHtml(
+            textContent
+          )}</pre>`
+        );
+
+        return;
+      }
+
+      if (extension === ".csv") {
+        const csvText =
+          await blob.text();
+
+        const parseCsv = (input) => {
+          const rows = [];
+          let row = [];
+          let field = "";
+          let inQuotes = false;
+
+          for (
+            let index = 0;
+            index < input.length;
+            index += 1
+          ) {
+            const character = input[index];
+
+            if (inQuotes) {
+              if (character === '"') {
+                if (
+                  input[index + 1] === '"'
+                ) {
+                  field += '"';
+                  index += 1;
+                } else {
+                  inQuotes = false;
+                }
+              } else {
+                field += character;
+              }
+
+              continue;
+            }
+
+            if (character === '"') {
+              inQuotes = true;
+              continue;
+            }
+
+            if (
+              character === "," ||
+              character === ";"
+            ) {
+              row.push(field);
+              field = "";
+              continue;
+            }
+
+            if (character === "\n") {
+              row.push(field);
+              rows.push(row);
+              row = [];
+              field = "";
+              continue;
+            }
+
+            if (character === "\r") {
+              if (
+                input[index + 1] === "\n"
+              ) {
+                continue;
+              }
+
+              row.push(field);
+              rows.push(row);
+              row = [];
+              field = "";
+              continue;
+            }
+
+            field += character;
+          }
+
+          if (
+            field !== "" ||
+            row.length > 0
+          ) {
+            row.push(field);
+            rows.push(row);
+          }
+
+          return rows;
+        };
+
+        const csvRows =
+          parseCsv(csvText);
+
+        const tableRows = csvRows
+          .map(
+            (row) =>
+              `<tr>${row
+                .map(
+                  (cell) =>
+                    `<td>${escapeHtml(
+                      cell
+                    )}</td>`
+                )
+                .join("")}</tr>`
+          )
+          .join("");
+
+        writePreviewDocument(
+          filename,
+          `<table>${tableRows}</table>`
+        );
+
+        return;
+      }
+
+      const blobUrl =
+        URL.createObjectURL(blob);
+
+      if (previewWindow) {
+        previewWindow.location.href =
+          blobUrl;
+      } else {
+        window.open(
+          blobUrl,
+          "_blank"
+        );
+      }
+
+      window.setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+      }, 60000);
+    } catch (error) {
+      if (
+        previewWindow &&
+        !previewWindow.closed
+      ) {
+        previewWindow.close();
+      }
+
+      console.error(
+        "View document error:",
+        error
+      );
+
+      setError(
+        t.private.documentViewError
+      );
     }
   }
 
@@ -1290,6 +1769,18 @@ const Private = () => {
                           }
                         >
                           ✎ {t.private.renameDocument}
+                        </button>
+
+                        <button
+                          type="button"
+                          className="!border-[rgba(96,165,250,0.26)] !text-[#93c5fd] hover:!border-[rgba(96,165,250,0.5)] hover:!bg-[rgba(30,64,175,0.16)]"
+                          onClick={() =>
+                            viewDocument(
+                              documentFile
+                            )
+                          }
+                        >
+                          👁 {t.private.viewDocument}
                         </button>
 
                         <button

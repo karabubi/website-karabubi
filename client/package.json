@@ -10,10 +10,12 @@
     "@mui/icons-material": "^6.4.6",
     "@mui/material": "^6.4.6",
     "axios": "^1.8.4",
+    "mammoth": "^1.12.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
-    "react-toastify": "^11.0.5"
+    "react-toastify": "^11.0.5",
+    "read-excel-file": "^9.3.10"
   },
   "scripts": {
     "dev": "vite",

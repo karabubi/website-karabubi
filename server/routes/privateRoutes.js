@@ -147,6 +147,8 @@ function documentToResponse(file) {
       getDocumentMimeType(file.filename),
     uploadedAt: file.birthtime.toISOString(),
     updatedAt: file.mtime.toISOString(),
+    viewUrl:
+      `/private/documents/${encoded}/view`,
     downloadUrl:
       `/private/documents/${encoded}/download`,
   };
@@ -480,6 +482,96 @@ router.post(
         } uploaded successfully.`,
       documents,
     });
+  }
+);
+
+router.get(
+  "/documents/:filename/view",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const filename =
+        String(req.params.filename || "");
+
+      if (!validateStoredFilename(filename)) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid document filename.",
+        });
+      }
+
+      const extension =
+        path.extname(filename).toLowerCase();
+
+      if (
+        !ALLOWED_DOCUMENT_EXTENSIONS.has(
+          extension
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid document type.",
+        });
+      }
+
+      const userDirectory =
+        getUserDocumentDirectory(req.user.id);
+
+      const filePath =
+        path.join(userDirectory, filename);
+
+      try {
+        const stat =
+          await fs.promises.stat(filePath);
+
+        if (!stat.isFile()) {
+          throw new Error("Not a file");
+        }
+      } catch {
+        return res.status(404).json({
+          success: false,
+          error: "Document not found.",
+        });
+      }
+
+      res.setHeader(
+        "Content-Type",
+        getDocumentMimeType(filename)
+      );
+
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename*=UTF-8''${encodeURIComponent(
+          filename
+        )}`
+      );
+
+      return res.sendFile(filePath, (error) => {
+        if (error && !res.headersSent) {
+          console.error(
+            "View private document error:",
+            error
+          );
+
+          res.status(500).json({
+            success: false,
+            error: "Unable to view document.",
+          });
+        }
+      });
+    } catch (error) {
+      console.error(
+        "View private document error:",
+        error
+      );
+
+      if (!res.headersSent) {
+        return res.status(500).json({
+          success: false,
+          error: "Unable to view document.",
+        });
+      }
+    }
   }
 );
 
