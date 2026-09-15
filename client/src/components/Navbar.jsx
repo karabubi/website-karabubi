@@ -70,6 +70,13 @@ function Navbar() {
           >
             {t.nav.contact}
           </NavLink>
+
+          <NavLink
+            to="/wisdom"
+            className={navClass}
+          >
+            {t.nav.wisdom}
+          </NavLink>
         </nav>
 
         <div className="flex shrink-0 flex-row items-center justify-end gap-3 whitespace-nowrap max-[900px]:ms-auto max-[900px]:min-w-0 max-[900px]:shrink max-[900px]:gap-2 max-[640px]:gap-1.5">
@@ -97,12 +104,21 @@ function Navbar() {
           {!loading && user ? (
             <>
               {user.role === "admin" && (
-                <Link
-                  to="/register"
-                  className="rounded-xl border border-blue-500/40 bg-blue-500/10 px-3.5 py-2.5 font-semibold text-blue-300 no-underline transition-colors hover:bg-blue-500/20 hover:text-blue-200 max-[640px]:px-2.5 max-[640px]:py-2 max-[640px]:text-[0.82rem]"
-                >
-                  Create user
-                </Link>
+                <>
+                  <Link
+                    to="/admin/wisdom"
+                    className="rounded-xl border border-blue-500/40 bg-blue-500/10 px-3.5 py-2.5 font-semibold text-blue-300 no-underline transition-colors hover:bg-blue-500/20 hover:text-blue-200 max-[640px]:px-2.5 max-[640px]:py-2 max-[640px]:text-[0.82rem]"
+                  >
+                    {t.nav.manageWisdom}
+                  </Link>
+
+                  <Link
+                    to="/register"
+                    className="rounded-xl border border-blue-500/40 bg-blue-500/10 px-3.5 py-2.5 font-semibold text-blue-300 no-underline transition-colors hover:bg-blue-500/20 hover:text-blue-200 max-[640px]:px-2.5 max-[640px]:py-2 max-[640px]:text-[0.82rem]"
+                  >
+                    Create user
+                  </Link>
+                </>
               )}
 
               <Link

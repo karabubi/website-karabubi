@@ -8,6 +8,8 @@ const de = {
     signOut: "Abmelden",
     signIn: "Anmelden",
     createAccount: "Konto erstellen",
+    wisdom: "Weisheiten",
+    manageWisdom: "Weisheiten verwalten",
   },
 
 
@@ -182,6 +184,44 @@ const de = {
     deleteError: 'Foto konnte nicht gelöscht werden.',
     downloadError: 'Foto konnte nicht heruntergeladen werden.',
     deleteDescription: 'wird dauerhaft aus Ihrer privaten Bibliothek entfernt. Diese Aktion kann nicht rückgängig gemacht werden.',
+  },
+
+  wisdom: {
+    eyebrow: "Weisheiten",
+    title: "Eine kleine Weisheit für Ihren Tag",
+    description: "Entdecken Sie kurze Weisheiten, die vom Administrator hinzugefügt wurden.",
+    loading: "Weisheit wird geladen...",
+    loadError: "Die Weisheit konnte nicht geladen werden.",
+    tryAgain: "Erneut versuchen",
+    showAnother: "Weitere anzeigen",
+    emptyTitle: "Noch keine Weisheiten",
+    emptyText: "Derzeit sind keine Weisheiten verfügbar.",
+  },
+
+  adminWisdom: {
+    loading: "Weisheitenverwaltung wird geladen...",
+    eyebrow: "Administrator",
+    title: "Weisheiten verwalten",
+    description: "Fügen Sie Weisheiten hinzu, bearbeiten oder löschen Sie sie. Diese werden auf der öffentlichen Weisheiten-Seite angezeigt.",
+    loadError: "Weisheiten konnten nicht geladen werden.",
+    quoteRequired: "Bitte geben Sie eine Weisheit ein.",
+    updateSuccess: "Die Weisheit wurde erfolgreich aktualisiert.",
+    createSuccess: "Die Weisheit wurde erfolgreich hinzugefügt.",
+    saveError: "Die Weisheit konnte nicht gespeichert werden.",
+    deleteConfirm: "Diese Weisheit löschen?",
+    deleteSuccess: "Die Weisheit wurde erfolgreich gelöscht.",
+    deleteError: "Die Weisheit konnte nicht gelöscht werden.",
+    editQuote: "Weisheit bearbeiten",
+    newQuote: "Neue Weisheit",
+    placeholder: "Geben Sie eine kurze Weisheit ein...",
+    saving: "Wird gespeichert...",
+    saveChanges: "Änderungen speichern",
+    addQuote: "Weisheit hinzufügen",
+    cancel: "Abbrechen",
+    savedQuotes: "Gespeicherte Weisheiten",
+    empty: "Es wurden noch keine Weisheiten hinzugefügt.",
+    edit: "Bearbeiten",
+    delete: "Löschen",
   },
 
   home: {

@@ -10,6 +10,7 @@ const db = require('./db');
 const authRoutes = require('./routes/authRoutes');
 const privateRoutes = require('./routes/privateRoutes');
 const analyticsRoutes = require("./routes/analyticsRoutes");
+const wisdomRoutes = require("./routes/wisdomRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -57,6 +58,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/private', privateRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/wisdom", wisdomRoutes);
 
 // Fehlerbehandlung
 app.use((err, req, res, next) => {

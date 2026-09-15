@@ -8,6 +8,8 @@ const ar = {
     signOut: "تسجيل الخروج",
     signIn: "تسجيل الدخول",
     createAccount: "إنشاء حساب",
+    wisdom: "حِكم",
+    manageWisdom: "إدارة الحِكم",
   },
 
 
@@ -182,6 +184,44 @@ const ar = {
     deleteError: 'تعذر حذف الصورة.',
     downloadError: 'تعذر تنزيل الصورة.',
     deleteDescription: 'سيتم حذفها نهائيًا من مكتبتك الخاصة. لا يمكن التراجع عن هذا الإجراء.',
+  },
+
+  wisdom: {
+    eyebrow: "حِكم",
+    title: "حكمة قصيرة ليومك",
+    description: "اكتشف حِكمًا قصيرة أضافها المسؤول.",
+    loading: "جارٍ تحميل الحكمة...",
+    loadError: "تعذر تحميل الحكمة.",
+    tryAgain: "حاول مرة أخرى",
+    showAnother: "اعرض حكمة أخرى",
+    emptyTitle: "لا توجد حِكم بعد",
+    emptyText: "لا توجد حِكم متاحة حاليًا.",
+  },
+
+  adminWisdom: {
+    loading: "جارٍ تحميل إدارة الحِكم...",
+    eyebrow: "المشرف",
+    title: "إدارة الحِكم",
+    description: "أضف الحِكم التي تظهر في صفحة الحِكم العامة أو عدّلها أو احذفها.",
+    loadError: "تعذر تحميل الحِكم.",
+    quoteRequired: "يرجى إدخال حكمة.",
+    updateSuccess: "تم تحديث الحكمة بنجاح.",
+    createSuccess: "تمت إضافة الحكمة بنجاح.",
+    saveError: "تعذر حفظ الحكمة.",
+    deleteConfirm: "هل تريد حذف هذه الحكمة؟",
+    deleteSuccess: "تم حذف الحكمة بنجاح.",
+    deleteError: "تعذر حذف الحكمة.",
+    editQuote: "تعديل الحكمة",
+    newQuote: "حكمة جديدة",
+    placeholder: "أدخل حكمة قصيرة...",
+    saving: "جارٍ الحفظ...",
+    saveChanges: "حفظ التغييرات",
+    addQuote: "إضافة حكمة",
+    cancel: "إلغاء",
+    savedQuotes: "الحِكم المحفوظة",
+    empty: "لم تتم إضافة أي حِكم بعد.",
+    edit: "تعديل",
+    delete: "حذف",
   },
 
   home: {

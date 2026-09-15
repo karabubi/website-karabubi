@@ -8,6 +8,8 @@ const en = {
     signOut: "Sign out",
     signIn: "Sign in",
     createAccount: "Create account",
+    wisdom: "Wisdom",
+    manageWisdom: "Manage Wisdom",
   },
 
 
@@ -182,6 +184,44 @@ const en = {
     deleteError: 'Unable to delete photo.',
     downloadError: 'Unable to download photo.',
     deleteDescription: 'will be permanently removed from your private library. This action cannot be undone.',
+  },
+
+  wisdom: {
+    eyebrow: "Wisdom",
+    title: "A little wisdom for your day",
+    description: "Discover short wisdom quotes added by the administrator.",
+    loading: "Loading wisdom...",
+    loadError: "Unable to load a wisdom quote.",
+    tryAgain: "Try again",
+    showAnother: "Show another",
+    emptyTitle: "No wisdom quotes yet",
+    emptyText: "No wisdom quotes are available yet.",
+  },
+
+  adminWisdom: {
+    loading: "Loading wisdom management...",
+    eyebrow: "Administrator",
+    title: "Manage Wisdom",
+    description: "Add, edit and delete the wisdom quotes shown on the public Wisdom page.",
+    loadError: "Unable to load wisdom quotes.",
+    quoteRequired: "Please enter a wisdom quote.",
+    updateSuccess: "Wisdom quote updated successfully.",
+    createSuccess: "Wisdom quote added successfully.",
+    saveError: "Unable to save the wisdom quote.",
+    deleteConfirm: "Delete this wisdom quote?",
+    deleteSuccess: "Wisdom quote deleted successfully.",
+    deleteError: "Unable to delete the wisdom quote.",
+    editQuote: "Edit wisdom quote",
+    newQuote: "New wisdom quote",
+    placeholder: "Enter a short wisdom quote...",
+    saving: "Saving...",
+    saveChanges: "Save changes",
+    addQuote: "Add quote",
+    cancel: "Cancel",
+    savedQuotes: "Saved quotes",
+    empty: "No wisdom quotes have been added yet.",
+    edit: "Edit",
+    delete: "Delete",
   },
 
   home: {

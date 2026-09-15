@@ -13,6 +13,8 @@ import Contact from "./components/Contact";
 import Private from "./components/Private";
 import Register from "./components/Register";
 import Login from "./components/Login";
+import Wisdom from "./components/Wisdom";
+import AdminWisdom from "./components/AdminWisdom";
 
 import { AuthProvider } from "./context/AuthContext";
 
@@ -28,6 +30,8 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/photos" element={<Photos />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/wisdom" element={<Wisdom />} />
+          <Route path="/admin/wisdom" element={<AdminWisdom />} />
           <Route path="/private" element={<Private />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
