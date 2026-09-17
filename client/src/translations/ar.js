@@ -10,6 +10,8 @@ const ar = {
     createAccount: "إنشاء حساب",
     wisdom: "حِكم",
     manageWisdom: "إدارة الحِكم",
+    poetry: "الشعر",
+    managePoetry: "إدارة الشعر",
   },
 
 
@@ -196,6 +198,21 @@ const ar = {
     showAnother: "اعرض حكمة أخرى",
     emptyTitle: "لا توجد حِكم بعد",
     emptyText: "لا توجد حِكم متاحة حاليًا.",
+  },
+
+  poetry: {
+    eyebrow: "الحكمة · الشعر",
+    title: "شعر الحكمة",
+    description: "أبيات خالدة وكلمات عميقة جُمعت لتُلهم التأمل، وتوسّع الرؤية، وتمنح الحكمة.",
+    loading: "جارٍ تحميل قصيدة...",
+    loadErrorTitle: "تعذر تحميل القصيدة",
+    loadError: "تعذر تحميل القصيدة.",
+    tryAgain: "حاول مرة أخرى",
+    showAnother: "اكتشف قصيدة أخرى",
+    randomHint: "يتم اختيار قصيدة جديدة في كل مرة.",
+    emptyTitle: "الشعر قادم قريبًا",
+    emptyText: "ستظهر هنا أبيات جديدة من الحكمة عند نشرها.",
+    footer: "كلمات · تأمل · حكمة",
   },
 
   adminWisdom: {

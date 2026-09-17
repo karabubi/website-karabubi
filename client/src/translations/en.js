@@ -10,6 +10,8 @@ const en = {
     createAccount: "Create account",
     wisdom: "Wisdom",
     manageWisdom: "Manage Wisdom",
+    poetry: "Poetry",
+    managePoetry: "Manage Poetry",
   },
 
 
@@ -196,6 +198,21 @@ const en = {
     showAnother: "Show another",
     emptyTitle: "No wisdom quotes yet",
     emptyText: "No wisdom quotes are available yet.",
+  },
+
+  poetry: {
+    eyebrow: "Wisdom · Poetry",
+    title: "Poetry of Wisdom",
+    description: "Timeless verses and thoughtful words gathered to inspire reflection, perspective and wisdom.",
+    loading: "Discovering a poem...",
+    loadErrorTitle: "Poetry could not be loaded",
+    loadError: "Unable to load poetry.",
+    tryAgain: "Try again",
+    showAnother: "Discover another poem",
+    randomHint: "A new poem is selected each time.",
+    emptyTitle: "Poetry is coming soon",
+    emptyText: "New verses of wisdom will appear here when they are published.",
+    footer: "Words · Reflection · Wisdom",
   },
 
   adminWisdom: {

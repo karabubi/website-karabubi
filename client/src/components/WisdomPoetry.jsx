@@ -3,6 +3,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useLanguage } from "../context/LanguageContext";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -61,6 +62,8 @@ function RefreshIcon({
 }
 
 function WisdomPoetry() {
+  const { t } = useLanguage();
+
   const [poem, setPoem] =
     useState(null);
 
@@ -91,7 +94,7 @@ function WisdomPoetry() {
         if (!response.ok) {
           throw new Error(
             data.error ||
-              "Unable to load poetry."
+              t.poetry.loadError
           );
         }
 
@@ -101,13 +104,13 @@ function WisdomPoetry() {
 
         setError(
           requestError.message ||
-            "Unable to load poetry."
+            t.poetry.loadError
         );
       } finally {
         setLoading(false);
       }
     },
-    []
+    [t]
   );
 
   useEffect(() => {
@@ -151,19 +154,17 @@ function WisdomPoetry() {
             <SparkleIcon className="h-4 w-4 text-violet-300" />
 
             <span className="text-xs font-bold uppercase tracking-[0.24em] text-violet-200 sm:text-sm">
-              Wisdom · Poetry
+              {t.poetry.eyebrow}
             </span>
 
           </div>
 
           <h1 className="mt-7 bg-gradient-to-r from-white via-violet-100 to-blue-200 bg-clip-text text-4xl font-black tracking-[-0.045em] text-transparent sm:text-5xl lg:text-6xl">
-            Poetry of Wisdom
+            {t.poetry.title}
           </h1>
 
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg sm:leading-8">
-            Timeless verses and thoughtful words
-            gathered to inspire reflection,
-            perspective and wisdom.
+            {t.poetry.description}
           </p>
 
         </header>
@@ -212,7 +213,7 @@ function WisdomPoetry() {
                   </div>
 
                   <p className="mt-6 text-sm font-medium tracking-wide text-slate-500">
-                    Discovering a poem...
+                    {t.poetry.loading}
                   </p>
                 </div>
               ) : error ? (
@@ -241,7 +242,7 @@ function WisdomPoetry() {
                   </div>
 
                   <h2 className="mt-6 text-xl font-bold text-white">
-                    Poetry could not be loaded
+                    {t.poetry.loadErrorTitle}
                   </h2>
 
                   <p className="mt-3 max-w-md leading-7 text-slate-400">
@@ -254,7 +255,7 @@ function WisdomPoetry() {
                     className="group mt-8 inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-6 py-3.5 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-400/30 hover:bg-violet-500/10"
                   >
                     <RefreshIcon className="h-4 w-4 transition-transform duration-500 group-hover:rotate-180" />
-                    Try again
+                    {t.poetry.tryAgain}
                   </button>
 
                 </div>
@@ -330,12 +331,12 @@ function WisdomPoetry() {
                     <RefreshIcon className="relative h-5 w-5 transition-transform duration-500 group-hover:rotate-180" />
 
                     <span className="relative">
-                      Discover another poem
+                      {t.poetry.showAnother}
                     </span>
                   </button>
 
                   <p className="mt-5 text-xs tracking-wide text-slate-600">
-                    A new poem is selected each time.
+                    {t.poetry.randomHint}
                   </p>
 
                 </div>
@@ -347,12 +348,11 @@ function WisdomPoetry() {
                   </div>
 
                   <h2 className="mt-6 text-2xl font-bold text-white">
-                    Poetry is coming soon
+                    {t.poetry.emptyTitle}
                   </h2>
 
                   <p className="mt-3 max-w-md leading-7 text-slate-400">
-                    New verses of wisdom will appear here
-                    when they are published.
+                    {t.poetry.emptyText}
                   </p>
 
                 </div>
@@ -364,7 +364,7 @@ function WisdomPoetry() {
           {/* Bottom detail */}
           <div className="mx-auto mt-6 flex items-center justify-center gap-3 text-xs font-medium uppercase tracking-[0.18em] text-slate-600">
             <span className="h-px w-8 bg-slate-800" />
-            Words · Reflection · Wisdom
+            {t.poetry.footer}
             <span className="h-px w-8 bg-slate-800" />
           </div>
 

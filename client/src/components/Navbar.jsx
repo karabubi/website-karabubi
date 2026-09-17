@@ -82,7 +82,7 @@ function Navbar() {
               to="/wisdom-poetry"
               className={navClass}
             >
-              Poetry
+              {t.nav.poetry}
             </NavLink>
         </nav>
 
@@ -123,7 +123,7 @@ function Navbar() {
                     to="/admin/wisdom-poetry"
                     className="rounded-xl border border-violet-500/40 bg-violet-500/10 px-3.5 py-2.5 font-semibold text-violet-300 no-underline transition-colors hover:bg-violet-500/20 hover:text-violet-200 max-[1500px]:px-2.5 max-[1500px]:text-[0.82rem] max-[640px]:px-2.5 max-[640px]:py-2 max-[640px]:text-[0.82rem]"
                   >
-                    Manage Poetry
+                    {t.nav.managePoetry}
                   </Link>
 
                   <Link

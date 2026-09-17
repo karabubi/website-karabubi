@@ -10,6 +10,8 @@ const de = {
     createAccount: "Konto erstellen",
     wisdom: "Weisheiten",
     manageWisdom: "Weisheiten verwalten",
+    poetry: "Poesie",
+    managePoetry: "Poesie verwalten",
   },
 
 
@@ -196,6 +198,21 @@ const de = {
     showAnother: "Weitere anzeigen",
     emptyTitle: "Noch keine Weisheiten",
     emptyText: "Derzeit sind keine Weisheiten verfügbar.",
+  },
+
+  poetry: {
+    eyebrow: "Weisheit · Poesie",
+    title: "Poesie der Weisheit",
+    description: "Zeitlose Verse und nachdenkliche Worte, die zum Nachdenken, zu neuen Perspektiven und zu Weisheit anregen.",
+    loading: "Ein Gedicht wird geladen...",
+    loadErrorTitle: "Das Gedicht konnte nicht geladen werden",
+    loadError: "Das Gedicht konnte nicht geladen werden.",
+    tryAgain: "Erneut versuchen",
+    showAnother: "Ein weiteres Gedicht entdecken",
+    randomHint: "Bei jeder Auswahl wird ein Gedicht zufällig ausgewählt.",
+    emptyTitle: "Poesie erscheint bald",
+    emptyText: "Neue Verse der Weisheit erscheinen hier, sobald sie veröffentlicht werden.",
+    footer: "Worte · Reflexion · Weisheit",
   },
 
   adminWisdom: {
