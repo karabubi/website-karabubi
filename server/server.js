@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const privateRoutes = require('./routes/privateRoutes');
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const wisdomRoutes = require("./routes/wisdomRoutes");
+const wisdomPoetryRoutes = require("./routes/wisdomPoetryRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -64,6 +65,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/private', privateRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/wisdom", wisdomRoutes);
+app.use("/api/wisdom-poetry", wisdomPoetryRoutes);
 
 // Fehlerbehandlung
 app.use((err, req, res, next) => {
