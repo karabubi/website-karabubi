@@ -13,26 +13,82 @@ const API_URL =
 const TOKEN_KEY =
   "websiteKarabubiToken";
 
+const MAX_IMAGE_SIZE =
+  10 * 1024 * 1024;
+
+const ALLOWED_IMAGE_TYPES =
+  new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ]);
+
+function getPoetryImageUrl(
+  imageUrl
+) {
+  if (!imageUrl) {
+    return "";
+  }
+
+  if (
+    /^https?:\/\//i.test(
+      imageUrl
+    )
+  ) {
+    return imageUrl;
+  }
+
+  return (
+    API_URL +
+    (
+      imageUrl.startsWith("/")
+        ? imageUrl
+        : `/${imageUrl}`
+    )
+  );
+}
+
 async function poetryRequest(
   path = "",
   options = {}
 ) {
   const token =
-    localStorage.getItem(TOKEN_KEY);
+    localStorage.getItem(
+      TOKEN_KEY
+    );
+
+  const isFormData =
+    typeof FormData !==
+      "undefined" &&
+    options.body instanceof FormData;
 
   const response = await fetch(
     `${API_URL}/wisdom-poetry${path}`,
     {
       ...options,
+
       credentials: "include",
+
       headers: {
-        "Content-Type": "application/json",
-        ...(token
-          ? {
-              Authorization:
-                `Bearer ${token}`,
-            }
-          : {}),
+        ...(
+          !isFormData &&
+          options.body
+            ? {
+                "Content-Type":
+                  "application/json",
+              }
+            : {}
+        ),
+
+        ...(
+          token
+            ? {
+                Authorization:
+                  `Bearer ${token}`,
+              }
+            : {}
+        ),
+
         ...(options.headers || {}),
       },
     }
@@ -41,7 +97,8 @@ async function poetryRequest(
   let data = {};
 
   try {
-    data = await response.json();
+    data =
+      await response.json();
   } catch {
     data = {};
   }
@@ -49,7 +106,7 @@ async function poetryRequest(
   if (!response.ok) {
     throw new Error(
       data.error ||
-        "Wisdom poetry request failed."
+      "Wisdom poetry request failed."
     );
   }
 
@@ -74,8 +131,30 @@ function AdminWisdomPoetry() {
   const [poem, setPoem] =
     useState("");
 
-  const [editingId, setEditingId] =
-    useState(null);
+  const [
+    editingId,
+    setEditingId,
+  ] = useState(null);
+
+  const [
+    imageFile,
+    setImageFile,
+  ] = useState(null);
+
+  const [
+    imagePreview,
+    setImagePreview,
+  ] = useState("");
+
+  const [
+    existingImageUrl,
+    setExistingImageUrl,
+  ] = useState("");
+
+  const [
+    removeImage,
+    setRemoveImage,
+  ] = useState(false);
 
   const [loading, setLoading] =
     useState(true);
@@ -89,6 +168,16 @@ function AdminWisdomPoetry() {
   const [message, setMessage] =
     useState("");
 
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(
+          imagePreview
+        );
+      }
+    };
+  }, [imagePreview]);
+
   const loadPoems = useCallback(
     async () => {
       setLoading(true);
@@ -96,13 +185,19 @@ function AdminWisdomPoetry() {
 
       try {
         const data =
-          await poetryRequest("/");
+          await poetryRequest(
+            "/"
+          );
 
-        setPoems(data.poems || []);
-      } catch (requestError) {
+        setPoems(
+          data.poems || []
+        );
+      } catch (
+        requestError
+      ) {
         setError(
           requestError.message ||
-            "Unable to load poems."
+          "Unable to load poems."
         );
       } finally {
         setLoading(false);
@@ -132,7 +227,9 @@ function AdminWisdomPoetry() {
     );
   }
 
-  if (user?.role !== "admin") {
+  if (
+    user?.role !== "admin"
+  ) {
     return (
       <Navigate
         to="/login"
@@ -141,12 +238,90 @@ function AdminWisdomPoetry() {
     );
   }
 
+  const activeImagePreview =
+    imagePreview ||
+    (
+      !removeImage &&
+      existingImageUrl
+        ? getPoetryImageUrl(
+            existingImageUrl
+          )
+        : ""
+    );
+
   const resetForm = () => {
     setTitle("");
     setAuthor("");
     setPoem("");
+
+    setImageFile(null);
+    setImagePreview("");
+    setExistingImageUrl("");
+    setRemoveImage(false);
+
     setEditingId(null);
   };
+
+  const handleImageChange = (
+    event
+  ) => {
+    const file =
+      event.target.files?.[0];
+
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    if (
+      !ALLOWED_IMAGE_TYPES.has(
+        file.type
+      )
+    ) {
+      setError(
+        "Please select a JPG, PNG or WEBP image."
+      );
+
+      return;
+    }
+
+    if (
+      file.size >
+      MAX_IMAGE_SIZE
+    ) {
+      setError(
+        "Image must be 10 MB or smaller."
+      );
+
+      return;
+    }
+
+    const preview =
+      URL.createObjectURL(file);
+
+    setImageFile(file);
+    setImagePreview(preview);
+    setRemoveImage(false);
+
+    setError("");
+    setMessage("");
+  };
+
+  const handleRemoveImage =
+    () => {
+      setImageFile(null);
+      setImagePreview("");
+
+      setRemoveImage(
+        Boolean(
+          existingImageUrl
+        )
+      );
+
+      setError("");
+      setMessage("");
+    };
 
   const handleSubmit = async (
     event
@@ -160,6 +335,7 @@ function AdminWisdomPoetry() {
       setError(
         "Please enter the poetry text."
       );
+
       return;
     }
 
@@ -167,11 +343,35 @@ function AdminWisdomPoetry() {
     setError("");
     setMessage("");
 
-    const payload = {
-      title: title.trim(),
-      author: author.trim(),
-      poem: normalizedPoem,
-    };
+    const formData =
+      new FormData();
+
+    formData.append(
+      "title",
+      title.trim()
+    );
+
+    formData.append(
+      "author",
+      author.trim()
+    );
+
+    formData.append(
+      "poem",
+      normalizedPoem
+    );
+
+    formData.append(
+      "removeImage",
+      String(removeImage)
+    );
+
+    if (imageFile) {
+      formData.append(
+        "image",
+        imageFile
+      );
+    }
 
     try {
       if (editingId) {
@@ -179,9 +379,7 @@ function AdminWisdomPoetry() {
           `/${editingId}`,
           {
             method: "PATCH",
-            body: JSON.stringify(
-              payload
-            ),
+            body: formData,
           }
         );
 
@@ -189,12 +387,13 @@ function AdminWisdomPoetry() {
           "Poem updated successfully."
         );
       } else {
-        await poetryRequest("/", {
-          method: "POST",
-          body: JSON.stringify(
-            payload
-          ),
-        });
+        await poetryRequest(
+          "/",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         setMessage(
           "Poem added successfully."
@@ -202,22 +401,48 @@ function AdminWisdomPoetry() {
       }
 
       resetForm();
+
       await loadPoems();
-    } catch (requestError) {
+    } catch (
+      requestError
+    ) {
       setError(
         requestError.message ||
-          "Unable to save poem."
+        "Unable to save poem."
       );
     } finally {
       setSaving(false);
     }
   };
 
-  const startEdit = (item) => {
-    setEditingId(item.id);
-    setTitle(item.title || "");
-    setAuthor(item.author || "");
-    setPoem(item.poem || "");
+  const startEdit = (
+    item
+  ) => {
+    setEditingId(
+      item.id
+    );
+
+    setTitle(
+      item.title || ""
+    );
+
+    setAuthor(
+      item.author || ""
+    );
+
+    setPoem(
+      item.poem || ""
+    );
+
+    setImageFile(null);
+    setImagePreview("");
+
+    setExistingImageUrl(
+      item.imageUrl || ""
+    );
+
+    setRemoveImage(false);
+
     setError("");
     setMessage("");
 
@@ -227,50 +452,53 @@ function AdminWisdomPoetry() {
     });
   };
 
-  const deletePoem = async (
-    item
-  ) => {
-    const confirmed =
-      window.confirm(
-        "Are you sure you want to delete this poem?"
-      );
+  const deletePoem =
+    async (item) => {
+      const confirmed =
+        window.confirm(
+          "Are you sure you want to delete this poem?"
+        );
 
-    if (!confirmed) {
-      return;
-    }
-
-    setError("");
-    setMessage("");
-
-    try {
-      await poetryRequest(
-        `/${item.id}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (editingId === item.id) {
-        resetForm();
+      if (!confirmed) {
+        return;
       }
 
-      setMessage(
-        "Poem deleted successfully."
-      );
+      setError("");
+      setMessage("");
 
-      await loadPoems();
-    } catch (requestError) {
-      setError(
-        requestError.message ||
+      try {
+        await poetryRequest(
+          `/${item.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        if (
+          editingId ===
+          item.id
+        ) {
+          resetForm();
+        }
+
+        setMessage(
+          "Poem deleted successfully."
+        );
+
+        await loadPoems();
+      } catch (
+        requestError
+      ) {
+        setError(
+          requestError.message ||
           "Unable to delete poem."
-      );
-    }
-  };
+        );
+      }
+    };
 
   return (
     <main className="min-h-[calc(100vh-86px)] bg-[#050816] px-6 py-14 text-slate-100">
       <section className="mx-auto w-full max-w-6xl">
-
         <span className="text-sm font-semibold uppercase tracking-[0.18em] text-violet-400">
           Administration
         </span>
@@ -280,15 +508,19 @@ function AdminWisdomPoetry() {
         </h1>
 
         <p className="mt-4 max-w-2xl leading-7 text-slate-400">
-          Add, edit and manage wisdom-themed poetry shown on the public website.
+          Add, edit and manage
+          wisdom-themed poetry
+          and optional images shown
+          on the public website.
         </p>
 
         <form
-          onSubmit={handleSubmit}
+          onSubmit={
+            handleSubmit
+          }
           className="mt-10 rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-2xl"
         >
           <div className="grid gap-5 md:grid-cols-2">
-
             <div>
               <label
                 htmlFor="poetry-title"
@@ -301,8 +533,13 @@ function AdminWisdomPoetry() {
                 id="poetry-title"
                 type="text"
                 value={title}
-                onChange={(event) =>
-                  setTitle(event.target.value)
+                onChange={(
+                  event
+                ) =>
+                  setTitle(
+                    event.target
+                      .value
+                  )
                 }
                 maxLength={200}
                 placeholder="Example: The Value of Time"
@@ -322,15 +559,19 @@ function AdminWisdomPoetry() {
                 id="poetry-author"
                 type="text"
                 value={author}
-                onChange={(event) =>
-                  setAuthor(event.target.value)
+                onChange={(
+                  event
+                ) =>
+                  setAuthor(
+                    event.target
+                      .value
+                  )
                 }
                 maxLength={200}
                 placeholder="Example: Imam Al-Shafi'i"
                 className="mt-3 w-full rounded-xl border border-slate-700 bg-slate-950 p-4 text-slate-100 outline-none focus:border-violet-500"
               />
             </div>
-
           </div>
 
           <div className="mt-5">
@@ -344,19 +585,109 @@ function AdminWisdomPoetry() {
             <textarea
               id="poetry-text"
               value={poem}
-              onChange={(event) =>
-                setPoem(event.target.value)
+              onChange={(
+                event
+              ) =>
+                setPoem(
+                  event.target
+                    .value
+                )
               }
               maxLength={5000}
               rows={10}
               placeholder={`Enter the poem here...
-
 Each line can be written on a new line.`}
               className="mt-3 w-full resize-y rounded-xl border border-slate-700 bg-slate-950 p-4 text-lg leading-8 text-slate-100 outline-none placeholder:text-slate-600 focus:border-violet-500"
             />
 
             <div className="mt-2 text-end text-sm text-slate-500">
               {poem.length}/5000
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-slate-700 bg-slate-950/70 p-5">
+            <div className="flex flex-col gap-5 md:flex-row md:items-start">
+              <div className="flex-1">
+                <label
+                  htmlFor="poetry-image"
+                  className="font-semibold text-slate-200"
+                >
+                  Poetry Image
+                </label>
+
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Optional. JPG, PNG
+                  or WEBP. Maximum
+                  size 10 MB.
+                </p>
+
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <label
+                    htmlFor="poetry-image"
+                    className="cursor-pointer rounded-xl bg-violet-600 px-5 py-2.5 font-semibold text-white transition hover:bg-violet-500"
+                  >
+                    Choose Image
+                  </label>
+
+                  <input
+                    id="poetry-image"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={
+                      handleImageChange
+                    }
+                    className="sr-only"
+                  />
+
+                  {activeImagePreview && (
+                    <button
+                      type="button"
+                      onClick={
+                        handleRemoveImage
+                      }
+                      className="cursor-pointer rounded-xl border border-red-500/40 px-5 py-2.5 font-semibold text-red-300 transition hover:bg-red-500/10"
+                    >
+                      Remove Image
+                    </button>
+                  )}
+                </div>
+
+                {imageFile && (
+                  <p className="mt-3 break-all text-sm text-violet-300">
+                    Selected:{" "}
+                    {imageFile.name}
+                  </p>
+                )}
+
+                {removeImage &&
+                  !imageFile && (
+                    <p className="mt-3 text-sm text-amber-300">
+                      The current
+                      image will be
+                      removed when
+                      you save.
+                    </p>
+                  )}
+              </div>
+
+              <div className="w-full md:w-72">
+                {activeImagePreview ? (
+                  <div className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900">
+                    <img
+                      src={
+                        activeImagePreview
+                      }
+                      alt="Poetry preview"
+                      className="h-56 w-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex h-56 items-center justify-center rounded-2xl border border-dashed border-slate-700 bg-slate-900/60 px-5 text-center text-sm text-slate-500">
+                    Image preview
+                    will appear here.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -388,7 +719,9 @@ Each line can be written on a new line.`}
             {editingId && (
               <button
                 type="button"
-                onClick={resetForm}
+                onClick={
+                  resetForm
+                }
                 className="cursor-pointer rounded-xl border border-slate-700 px-6 py-3 font-semibold text-slate-300 hover:border-slate-500 hover:text-white"
               >
                 Cancel
@@ -398,7 +731,6 @@ Each line can be written on a new line.`}
         </form>
 
         <div className="mt-12">
-
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-2xl font-semibold text-white">
               Saved Poetry
@@ -413,68 +745,104 @@ Each line can be written on a new line.`}
             <p className="mt-6 text-slate-400">
               Loading poems...
             </p>
-          ) : poems.length === 0 ? (
+          ) : poems.length ===
+            0 ? (
             <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-8 text-center text-slate-400">
-              No poetry has been added yet.
+              No poetry has been
+              added yet.
             </div>
           ) : (
             <div className="mt-6 grid gap-5">
-              {poems.map((item) => (
-                <article
-                  key={item.id}
-                  className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6"
-                >
-                  <div className="flex flex-col justify-between gap-5 md:flex-row">
-
-                    <div className="min-w-0 flex-1">
-
-                      {item.title && (
-                        <h3 className="text-xl font-bold text-white">
-                          {item.title}
-                        </h3>
+              {poems.map(
+                (item) => (
+                  <article
+                    key={
+                      item.id
+                    }
+                    className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6"
+                  >
+                    <div className="flex flex-col gap-6 lg:flex-row">
+                      {item.imageUrl && (
+                        <div className="w-full shrink-0 lg:w-56">
+                          <img
+                            src={getPoetryImageUrl(
+                              item.imageUrl
+                            )}
+                            alt={
+                              item.title ||
+                              item.author ||
+                              "Poetry"
+                            }
+                            className="h-52 w-full rounded-2xl border border-slate-800 bg-slate-950 object-contain"
+                          />
+                        </div>
                       )}
 
-                      {item.author && (
-                        <p className="mt-2 text-sm font-medium text-violet-300">
-                          — {item.author}
-                        </p>
-                      )}
+                      <div className="flex min-w-0 flex-1 flex-col justify-between gap-5 md:flex-row">
+                        <div className="min-w-0 flex-1">
+                          {item.title && (
+                            <h3
+                              dir="auto"
+                              className="text-xl font-bold text-white"
+                            >
+                              {
+                                item.title
+                              }
+                            </h3>
+                          )}
 
-                      <p
-                        dir="auto"
-                        className="mt-5 whitespace-pre-line text-lg leading-8 text-slate-300"
-                      >
-                        {item.poem}
-                      </p>
+                          {item.author && (
+                            <p
+                              dir="auto"
+                              className="mt-2 text-sm font-medium text-violet-300"
+                            >
+                              —{" "}
+                              {
+                                item.author
+                              }
+                            </p>
+                          )}
 
+                          <p
+                            dir="auto"
+                            className="mt-5 whitespace-pre-line text-lg leading-8 text-slate-300"
+                          >
+                            {
+                              item.poem
+                            }
+                          </p>
+                        </div>
+
+                        <div className="flex shrink-0 gap-3 md:flex-col">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              startEdit(
+                                item
+                              )
+                            }
+                            className="cursor-pointer rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              deletePoem(
+                                item
+                              )
+                            }
+                            className="cursor-pointer rounded-xl bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-500"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
                     </div>
-
-                    <div className="flex shrink-0 gap-3 md:flex-col">
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          startEdit(item)
-                        }
-                        className="cursor-pointer rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          deletePoem(item)
-                        }
-                        className="cursor-pointer rounded-xl bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-500"
-                      >
-                        Delete
-                      </button>
-
-                    </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                )
+              )}
             </div>
           )}
         </div>

@@ -80,3 +80,6 @@ server/.env.*
 server/storage/private-documents/*
 !server/storage/private-documents/.gitkeep
 .vercel
+
+# Local Wisdom Poetry uploads
+server/storage/wisdom-poetry-images/

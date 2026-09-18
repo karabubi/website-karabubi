@@ -265,6 +265,20 @@ function WisdomPoetry() {
                   aria-live="polite"
                 >
 
+                  {poem.imageUrl && (
+                    <div className="mb-8 w-full overflow-hidden rounded-[26px] border border-white/[0.08] bg-slate-950/70 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+                      <img
+                        src={`${API_URL}${poem.imageUrl}`}
+                        alt={
+                          poem.title ||
+                          poem.author ||
+                          "Wisdom poetry"
+                        }
+                        className="mx-auto max-h-[460px] w-full rounded-[20px] object-contain"
+                      />
+                    </div>
+                  )}
+
                   {/* Decorative mark */}
                   <div
                     aria-hidden="true"
