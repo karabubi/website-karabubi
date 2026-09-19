@@ -67,6 +67,8 @@ function WisdomPoetry() {
   const [poem, setPoem] =
     useState(null);
 
+  const [isImageOpen, setIsImageOpen] = useState(false);
+
   const [loading, setLoading] =
     useState(true);
 
@@ -266,20 +268,61 @@ function WisdomPoetry() {
                 >
 
                   {poem.imageUrl && (
-                    <div className="mb-8 w-full overflow-hidden rounded-[26px] border border-white/[0.08] bg-slate-950/70 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
-                      <img
-                        src={`${API_URL}${poem.imageUrl}`}
-                        alt={
-                          poem.title ||
-                          poem.author ||
-                          "Wisdom poetry"
-                        }
-                        className="mx-auto max-h-[460px] w-full rounded-[20px] object-contain"
-                      />
-                    </div>
+                    <>
+                      <div className="mb-8 w-full overflow-hidden rounded-[26px] border border-white/[0.08] bg-slate-950/70 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+                        <button
+                          type="button"
+                          onClick={() => setIsImageOpen(true)}
+                          className="block w-full cursor-zoom-in rounded-[20px] focus:outline-none focus:ring-2 focus:ring-violet-400/70"
+                          aria-label="Enlarge poetry image"
+                          title="Click to enlarge"
+                        >
+                          <img
+                            src={`${API_URL}${poem.imageUrl}`}
+                            alt={
+                              poem.title ||
+                              poem.author ||
+                              "Wisdom poetry"
+                            }
+                            className="mx-auto max-h-[460px] w-full rounded-[20px] object-contain transition-transform duration-200 hover:scale-[1.01]"
+                          />
+                        </button>
+                      </div>
+
+                      {isImageOpen && (
+                        <div
+                          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+                          role="dialog"
+                          aria-modal="true"
+                          aria-label="Enlarged poetry image"
+                          onClick={() => setIsImageOpen(false)}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => setIsImageOpen(false)}
+                            className="fixed right-4 top-4 z-[10000] flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/70 text-3xl text-white shadow-xl transition hover:bg-white hover:text-black"
+                            aria-label="Close enlarged image"
+                            title="Close image"
+                          >
+                            ×
+                          </button>
+
+                          <img
+                            src={`${API_URL}${poem.imageUrl}`}
+                            alt={
+                              poem.title ||
+                              poem.author ||
+                              "Wisdom poetry"
+                            }
+                            className="max-h-[92vh] max-w-[96vw] rounded-xl object-contain shadow-2xl"
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        </div>
+                      )}
+                    </>
                   )}
 
-                  {/* Decorative mark */}
+{/* Decorative mark */}
                   <div
                     aria-hidden="true"
                     className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-300/10 bg-gradient-to-br from-violet-400/10 to-blue-400/[0.04] shadow-lg shadow-violet-950/20"
