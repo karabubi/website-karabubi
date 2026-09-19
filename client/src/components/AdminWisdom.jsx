@@ -14,6 +14,30 @@ const API_URL =
 const TOKEN_KEY =
   "websiteKarabubiToken";
 
+const MAX_IMAGE_SIZE =
+  10 * 1024 * 1024;
+
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+];
+
+const getImageUrl = (imageUrl) => {
+  if (!imageUrl) {
+    return "";
+  }
+
+  if (
+    imageUrl.startsWith("http://") ||
+    imageUrl.startsWith("https://")
+  ) {
+    return imageUrl;
+  }
+
+  return `${API_URL}${imageUrl}`;
+};
+
 async function wisdomRequest(
   path = "",
   options = {}
@@ -21,20 +45,32 @@ async function wisdomRequest(
   const token =
     localStorage.getItem(TOKEN_KEY);
 
+  const isFormData =
+    typeof FormData !== "undefined" &&
+    options.body instanceof FormData;
+
   const response = await fetch(
     `${API_URL}/wisdom${path}`,
     {
       ...options,
       credentials: "include",
       headers: {
-        "Content-Type":
-          "application/json",
-        ...(token
-          ? {
-              Authorization:
-                `Bearer ${token}`,
-            }
-          : {}),
+        ...(
+          !isFormData
+            ? {
+                "Content-Type":
+                  "application/json",
+              }
+            : {}
+        ),
+        ...(
+          token
+            ? {
+                Authorization:
+                  `Bearer ${token}`,
+              }
+            : {}
+        ),
         ...(options.headers || {}),
       },
     }
@@ -68,16 +104,40 @@ function AdminWisdom() {
 
   const [quotes, setQuotes] =
     useState([]);
+
   const [quote, setQuote] =
     useState("");
+
   const [editingId, setEditingId] =
     useState(null);
+
+  const [imageFile, setImageFile] =
+    useState(null);
+
+  const [
+    imagePreview,
+    setImagePreview,
+  ] = useState("");
+
+  const [
+    existingImageUrl,
+    setExistingImageUrl,
+  ] = useState("");
+
+  const [
+    removeImage,
+    setRemoveImage,
+  ] = useState(false);
+
   const [loading, setLoading] =
     useState(true);
+
   const [saving, setSaving] =
     useState(false);
+
   const [error, setError] =
     useState("");
+
   const [message, setMessage] =
     useState("");
 
@@ -90,7 +150,9 @@ function AdminWisdom() {
         const data =
           await wisdomRequest("/");
 
-        setQuotes(data.quotes || []);
+        setQuotes(
+          data.quotes || []
+        );
       } catch (requestError) {
         setError(
           requestError.message ||
@@ -116,6 +178,21 @@ function AdminWisdom() {
     loadQuotes,
   ]);
 
+  useEffect(() => {
+    return () => {
+      if (
+        imagePreview &&
+        imagePreview.startsWith(
+          "blob:"
+        )
+      ) {
+        URL.revokeObjectURL(
+          imagePreview
+        );
+      }
+    };
+  }, [imagePreview]);
+
   if (authLoading) {
     return (
       <main className="min-h-[calc(100vh-86px)] bg-slate-950 px-6 py-16 text-center text-slate-300">
@@ -133,9 +210,89 @@ function AdminWisdom() {
     );
   }
 
+  const clearPreview = () => {
+    if (
+      imagePreview &&
+      imagePreview.startsWith(
+        "blob:"
+      )
+    ) {
+      URL.revokeObjectURL(
+        imagePreview
+      );
+    }
+
+    setImagePreview("");
+  };
+
   const resetForm = () => {
+    clearPreview();
+
     setQuote("");
     setEditingId(null);
+    setImageFile(null);
+    setExistingImageUrl("");
+    setRemoveImage(false);
+  };
+
+  const handleImageChange = (
+    event
+  ) => {
+    const file =
+      event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setError("");
+    setMessage("");
+
+    if (
+      !ALLOWED_IMAGE_TYPES.includes(
+        file.type
+      )
+    ) {
+      event.target.value = "";
+
+      setError(
+        "Please choose a JPG, PNG or WEBP image."
+      );
+
+      return;
+    }
+
+    if (
+      file.size > MAX_IMAGE_SIZE
+    ) {
+      event.target.value = "";
+
+      setError(
+        "Image must not exceed 10 MB."
+      );
+
+      return;
+    }
+
+    clearPreview();
+
+    setImageFile(file);
+    setImagePreview(
+      URL.createObjectURL(file)
+    );
+
+    setRemoveImage(false);
+  };
+
+  const handleRemoveImage = () => {
+    clearPreview();
+
+    setImageFile(null);
+    setRemoveImage(true);
+  };
+
+  const handleKeepImage = () => {
+    setRemoveImage(false);
   };
 
   const handleSubmit = async (
@@ -150,6 +307,7 @@ function AdminWisdom() {
       setError(
         t.adminWisdom.quoteRequired
       );
+
       return;
     }
 
@@ -158,14 +316,34 @@ function AdminWisdom() {
     setMessage("");
 
     try {
+      const formData =
+        new FormData();
+
+      formData.append(
+        "quote",
+        normalized
+      );
+
+      formData.append(
+        "removeImage",
+        removeImage
+          ? "true"
+          : "false"
+      );
+
+      if (imageFile) {
+        formData.append(
+          "image",
+          imageFile
+        );
+      }
+
       if (editingId) {
         await wisdomRequest(
           `/${editingId}`,
           {
             method: "PATCH",
-            body: JSON.stringify({
-              quote: normalized,
-            }),
+            body: formData,
           }
         );
 
@@ -175,9 +353,7 @@ function AdminWisdom() {
       } else {
         await wisdomRequest("/", {
           method: "POST",
-          body: JSON.stringify({
-            quote: normalized,
-          }),
+          body: formData,
         });
 
         setMessage(
@@ -186,6 +362,7 @@ function AdminWisdom() {
       }
 
       resetForm();
+
       await loadQuotes();
     } catch (requestError) {
       setError(
@@ -198,8 +375,24 @@ function AdminWisdom() {
   };
 
   const startEdit = (item) => {
+    clearPreview();
+
     setEditingId(item.id);
-    setQuote(item.quote);
+
+    setQuote(
+      item.quote || ""
+    );
+
+    setImageFile(null);
+
+    setExistingImageUrl(
+      getImageUrl(
+        item.imageUrl
+      )
+    );
+
+    setRemoveImage(false);
+
     setError("");
     setMessage("");
 
@@ -232,7 +425,9 @@ function AdminWisdom() {
         }
       );
 
-      if (editingId === item.id) {
+      if (
+        editingId === item.id
+      ) {
         resetForm();
       }
 
@@ -248,6 +443,14 @@ function AdminWisdom() {
       );
     }
   };
+
+  const activePreview =
+    imagePreview ||
+    (
+      !removeImage
+        ? existingImageUrl
+        : ""
+    );
 
   return (
     <main className="min-h-[calc(100vh-86px)] bg-slate-950 px-6 py-14 text-slate-100 max-[640px]:px-4 max-[640px]:py-10">
@@ -295,6 +498,104 @@ function AdminWisdom() {
 
           <div className="mt-2 text-end text-sm text-slate-500">
             {quote.length}/1000
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-amber-400/20 bg-amber-400/[0.04] p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="font-semibold text-amber-100">
+                  Pearl of Wisdom Image
+                </h2>
+
+                <p className="mt-1 text-sm leading-6 text-slate-400">
+                  Optional image shown with this wisdom quote.
+                  JPG, PNG or WEBP. Maximum size 10 MB.
+                </p>
+              </div>
+
+              <label className="cursor-pointer rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2.5 font-semibold text-amber-200 transition hover:bg-amber-400/20">
+                Choose Image
+
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={
+                    handleImageChange
+                  }
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            {imageFile && (
+              <p className="mt-3 text-sm text-slate-300">
+                Selected:{" "}
+                <span className="font-medium text-white">
+                  {imageFile.name}
+                </span>
+              </p>
+            )}
+
+            {activePreview && (
+              <div className="mt-5">
+                <p className="mb-2 text-sm font-medium text-slate-300">
+                  Image preview
+                </p>
+
+                <div className="flex justify-center overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 p-3">
+                  <img
+                    src={activePreview}
+                    alt="Pearl of Wisdom preview"
+                    className="max-h-[360px] max-w-full rounded-xl object-contain"
+                  />
+                </div>
+              </div>
+            )}
+
+            {existingImageUrl &&
+              !imageFile &&
+              !removeImage && (
+                <button
+                  type="button"
+                  onClick={
+                    handleRemoveImage
+                  }
+                  className="mt-4 cursor-pointer rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 font-semibold text-red-300 transition hover:bg-red-500/20"
+                >
+                  Remove Image
+                </button>
+              )}
+
+            {imageFile && (
+              <button
+                type="button"
+                onClick={
+                  handleRemoveImage
+                }
+                className="mt-4 cursor-pointer rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 font-semibold text-red-300 transition hover:bg-red-500/20"
+              >
+                Clear Selected Image
+              </button>
+            )}
+
+            {removeImage &&
+              existingImageUrl && (
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <span className="text-sm text-red-300">
+                    Existing image will be removed when you save.
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={
+                      handleKeepImage
+                    }
+                    className="cursor-pointer rounded-lg border border-slate-600 px-3 py-1.5 text-sm font-semibold text-slate-300 transition hover:border-slate-400 hover:text-white"
+                  >
+                    Keep Existing Image
+                  </button>
+                </div>
+              )}
           </div>
 
           {error && (
@@ -360,6 +661,18 @@ function AdminWisdom() {
                   key={item.id}
                   className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5"
                 >
+                  {item.imageUrl && (
+                    <div className="mb-5 flex justify-center overflow-hidden rounded-xl border border-amber-400/15 bg-slate-950 p-3">
+                      <img
+                        src={getImageUrl(
+                          item.imageUrl
+                        )}
+                        alt="Pearl of Wisdom"
+                        className="max-h-[240px] max-w-full rounded-lg object-contain"
+                      />
+                    </div>
+                  )}
+
                   <p className="whitespace-pre-wrap text-lg leading-8 text-slate-200">
                     {item.quote}
                   </p>

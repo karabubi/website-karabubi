@@ -3,13 +3,16 @@ import {
   useEffect,
   useState,
 } from "react";
+
 import { useLanguage } from "../context/LanguageContext";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5001/api";
 
-function SparkleIcon({ className = "" }) {
+function SparkleIcon({
+  className = "",
+}) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -23,6 +26,7 @@ function SparkleIcon({ className = "" }) {
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
+
       <path
         d="M19 16.75c.16 1.63 1.12 2.59 2.75 2.75-1.63.16-2.59 1.12-2.75 2.75-.16-1.63-1.12-2.59-2.75-2.75 1.63-.16 2.59-1.12 2.75-2.75Z"
         fill="currentColor"
@@ -31,7 +35,9 @@ function SparkleIcon({ className = "" }) {
   );
 }
 
-function RefreshIcon({ className = "" }) {
+function RefreshIcon({
+  className = "",
+}) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -46,6 +52,7 @@ function RefreshIcon({ className = "" }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+
       <path
         d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"
         stroke="currentColor"
@@ -62,24 +69,43 @@ function Wisdom() {
 
   const [wisdom, setWisdom] =
     useState(null);
+
   const [loading, setLoading] =
     useState(true);
+
   const [error, setError] =
     useState("");
+
+  const [
+    isImageOpen,
+    setIsImageOpen,
+  ] = useState(false);
+
+  const [
+    imageZoom,
+    setImageZoom,
+  ] = useState(100);
 
   const loadWisdom = useCallback(
     async () => {
       setLoading(true);
       setError("");
 
+      setIsImageOpen(false);
+      setImageZoom(100);
+
       try {
-        const response = await fetch(
-          `${API_URL}/wisdom/random`
-        );
+        const response =
+          await fetch(
+            `${API_URL}/wisdom/random`
+          );
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
-        if (response.status === 404) {
+        if (
+          response.status === 404
+        ) {
           setWisdom(null);
           return;
         }
@@ -94,6 +120,7 @@ function Wisdom() {
         setWisdom(data.quote);
       } catch (requestError) {
         setWisdom(null);
+
         setError(
           requestError.message ||
             t.wisdom.loadError
@@ -109,6 +136,21 @@ function Wisdom() {
     loadWisdom();
   }, [loadWisdom]);
 
+  const openImage = () => {
+    setImageZoom(100);
+    setIsImageOpen(true);
+  };
+
+  const closeImage = () => {
+    setIsImageOpen(false);
+    setImageZoom(100);
+  };
+
+  const wisdomImageUrl =
+    wisdom?.imageUrl
+      ? `${API_URL}${wisdom.imageUrl}`
+      : "";
+
   return (
     <main className="relative min-h-[calc(100vh-86px)] overflow-hidden bg-[#050816] text-slate-100">
       <div
@@ -116,7 +158,9 @@ function Wisdom() {
         className="pointer-events-none absolute inset-0"
       >
         <div className="absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full bg-blue-600/20 blur-[110px]" />
+
         <div className="absolute -right-32 top-20 h-[460px] w-[460px] rounded-full bg-violet-600/15 blur-[120px]" />
+
         <div className="absolute bottom-[-220px] left-1/2 h-[420px] w-[700px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[130px]" />
 
         <div
@@ -124,7 +168,8 @@ function Wisdom() {
           style={{
             backgroundImage:
               "linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)",
-            backgroundSize: "54px 54px",
+            backgroundSize:
+              "54px 54px",
           }}
         />
 
@@ -176,7 +221,9 @@ function Wisdom() {
                   >
                     <div className="relative mb-7">
                       <div className="h-14 w-14 rounded-full border-2 border-blue-400/15" />
+
                       <div className="absolute inset-0 h-14 w-14 animate-spin rounded-full border-2 border-transparent border-t-blue-400" />
+
                       <SparkleIcon className="absolute inset-0 m-auto h-5 w-5 text-blue-300" />
                     </div>
 
@@ -216,6 +263,7 @@ function Wisdom() {
                       className="group mt-8 inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.07] px-6 py-3.5 font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400/30 hover:bg-blue-500/15 focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:ring-offset-2 focus:ring-offset-slate-950"
                     >
                       <RefreshIcon className="h-4 w-4 transition-transform duration-500 group-hover:rotate-180" />
+
                       {t.wisdom.tryAgain}
                     </button>
                   </div>
@@ -224,6 +272,34 @@ function Wisdom() {
                     className="flex min-h-[330px] flex-col items-center justify-center text-center"
                     aria-live="polite"
                   >
+                    {wisdom.imageUrl && (
+                      <div className="mb-8 w-full">
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/[0.08] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-amber-200">
+                          <span>
+                            ✦
+                          </span>
+
+                          Pearl of Wisdom
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={openImage}
+                          className="mx-auto block w-full max-w-2xl cursor-zoom-in overflow-hidden rounded-[24px] border border-amber-300/15 bg-black/30 p-2 shadow-[0_22px_70px_rgba(0,0,0,0.38)] focus:outline-none focus:ring-2 focus:ring-amber-300/70"
+                          aria-label="Enlarge Pearl of Wisdom image"
+                          title="Click to enlarge"
+                        >
+                          <img
+                            src={
+                              wisdomImageUrl
+                            }
+                            alt="Pearl of Wisdom"
+                            className="mx-auto max-h-[430px] w-full rounded-[18px] object-contain transition-transform duration-200 hover:scale-[1.01]"
+                          />
+                        </button>
+                      </div>
+                    )}
+
                     <div
                       aria-hidden="true"
                       className="mb-3 select-none font-serif text-[84px] font-black leading-[0.7] text-blue-400/70 sm:text-[100px]"
@@ -243,7 +319,9 @@ function Wisdom() {
                       className="my-8 flex items-center gap-3"
                     >
                       <span className="h-px w-10 bg-gradient-to-r from-transparent to-blue-400/50" />
+
                       <span className="h-1.5 w-1.5 rotate-45 rounded-[1px] bg-blue-300/70" />
+
                       <span className="h-px w-10 bg-gradient-to-l from-transparent to-blue-400/50" />
                     </div>
 
@@ -306,12 +384,169 @@ function Wisdom() {
               className="mx-auto mt-6 flex items-center justify-center gap-2 text-blue-300/30"
             >
               <span className="h-1 w-1 rounded-full bg-current" />
+
               <span className="h-1 w-1 rounded-full bg-current" />
+
               <span className="h-1 w-1 rounded-full bg-current" />
             </div>
           </div>
         </div>
       </section>
+
+      {isImageOpen &&
+        wisdom?.imageUrl && (
+          <div
+            className="fixed inset-0 z-[9999] flex flex-col bg-black/90 p-3 backdrop-blur-sm sm:p-5"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Enlarged Pearl of Wisdom image"
+            onClick={closeImage}
+          >
+            <button
+              type="button"
+              onClick={closeImage}
+              className="fixed right-4 top-4 z-[10001] flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/75 text-3xl text-white shadow-xl transition hover:bg-white hover:text-black"
+              aria-label="Close enlarged image"
+              title="Close image"
+            >
+              ×
+            </button>
+
+            <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 overflow-auto rounded-[26px] border border-white/10 bg-black/70">
+              <div
+                className={`flex min-h-full min-w-full p-4 sm:p-6 ${
+                  imageZoom === 100
+                    ? "items-center justify-center"
+                    : "items-start justify-center"
+                }`}
+              >
+                <img
+                  src={wisdomImageUrl}
+                  alt="Pearl of Wisdom"
+                  className="block shrink-0 rounded-[20px] object-contain shadow-[0_30px_90px_rgba(0,0,0,0.55)]"
+                  style={
+                    imageZoom === 100
+                      ? {
+                          maxWidth:
+                            "100%",
+                          maxHeight:
+                            "calc(100vh - 190px)",
+                          width:
+                            "auto",
+                          height:
+                            "auto",
+                        }
+                      : {
+                          width:
+                            `${imageZoom}%`,
+                          maxWidth:
+                            "none",
+                          maxHeight:
+                            "none",
+                          height:
+                            "auto",
+                        }
+                  }
+                  onClick={(
+                    event
+                  ) =>
+                    event.stopPropagation()
+                  }
+                />
+              </div>
+            </div>
+
+            <div
+              className="mx-auto mt-3 flex w-full max-w-[560px] shrink-0 items-center gap-2 rounded-full border border-white/20 bg-black/80 px-3 py-2 text-white shadow-2xl backdrop-blur-md"
+              onClick={(event) =>
+                event.stopPropagation()
+              }
+            >
+              <button
+                type="button"
+                onClick={() =>
+                  setImageZoom(
+                    (zoom) =>
+                      Math.max(
+                        100,
+                        zoom - 10
+                      )
+                  )
+                }
+                disabled={
+                  imageZoom <= 100
+                }
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-2xl transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+                aria-label="Zoom out"
+                title="Zoom out"
+              >
+                −
+              </button>
+
+              <input
+                type="range"
+                min="100"
+                max="200"
+                step="10"
+                value={imageZoom}
+                onChange={(event) =>
+                  setImageZoom(
+                    Number(
+                      event.target
+                        .value
+                    )
+                  )
+                }
+                className="min-w-0 flex-1 cursor-pointer"
+                aria-label="Image zoom"
+                title="Image zoom"
+              />
+
+              <span
+                className="min-w-[58px] text-center text-sm font-semibold tabular-nums"
+                aria-live="polite"
+              >
+                {imageZoom}%
+              </span>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setImageZoom(
+                    (zoom) =>
+                      Math.min(
+                        200,
+                        zoom + 10
+                      )
+                  )
+                }
+                disabled={
+                  imageZoom >= 200
+                }
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-2xl transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+                aria-label="Zoom in"
+                title="Zoom in"
+              >
+                +
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setImageZoom(100)
+                }
+                disabled={
+                  imageZoom === 100
+                }
+                className="shrink-0 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+                aria-label="Reset zoom"
+                title="Reset zoom"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        )}
     </main>
   );
 }

@@ -1,4 +1,7 @@
-const { DataTypes } = require("sequelize");
+const {
+  DataTypes,
+} = require("sequelize");
+
 const sequelize = require("../db");
 
 const WisdomQuote = sequelize.define(
@@ -11,6 +14,11 @@ const WisdomQuote = sequelize.define(
         notEmpty: true,
         len: [1, 1000],
       },
+    },
+
+    imageFilename: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
     },
   },
   {

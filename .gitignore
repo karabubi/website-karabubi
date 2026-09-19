@@ -83,3 +83,5 @@ server/storage/private-documents/*
 
 # Local Wisdom Poetry uploads
 server/storage/wisdom-poetry-images/
+
+server/storage/wisdom-images/
