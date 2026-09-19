@@ -295,7 +295,7 @@ function WisdomPoetry() {
 
                       {isImageOpen && (
                         <div
-                          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-auto bg-black/90 p-4 backdrop-blur-sm"
+                          className="fixed inset-0 z-[9999] flex flex-col bg-black/90 p-3 backdrop-blur-sm sm:p-5"
                           role="dialog"
                           aria-modal="true"
                           aria-label="Enlarged poetry image"
@@ -304,9 +304,64 @@ function WisdomPoetry() {
                             setImageZoom(100);
                           }}
                         >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsImageOpen(false);
+                              setImageZoom(100);
+                            }}
+                            className="fixed right-4 top-4 z-[10001] flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/75 text-3xl text-white shadow-xl transition hover:bg-white hover:text-black"
+                            aria-label="Close enlarged image"
+                            title="Close image"
+                          >
+                            ×
+                          </button>
+
                           <div
-                            className="fixed bottom-5 left-1/2 z-[10000] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-full border border-white/20 bg-black/80 px-3 py-2 text-white shadow-2xl backdrop-blur-md"
-                            onClick={(event) => event.stopPropagation()}
+                            className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 overflow-auto rounded-[26px] border border-white/10 bg-black/70"
+                          >
+                            <div
+                              className={`flex min-h-full min-w-full p-4 sm:p-6 ${
+                                imageZoom === 100
+                                  ? "items-center justify-center"
+                                  : "items-start justify-center"
+                              }`}
+                            >
+                              <img
+                                src={`${API_URL}${poem.imageUrl}`}
+                                alt={
+                                  poem.title ||
+                                  poem.author ||
+                                  "Wisdom poetry"
+                                }
+                                className="block shrink-0 rounded-[20px] object-contain shadow-[0_30px_90px_rgba(0,0,0,0.55)]"
+                                style={
+                                  imageZoom === 100
+                                    ? {
+                                        maxWidth: "100%",
+                                        maxHeight: "calc(100vh - 190px)",
+                                        width: "auto",
+                                        height: "auto",
+                                      }
+                                    : {
+                                        width: `${imageZoom}%`,
+                                        maxWidth: "none",
+                                        maxHeight: "none",
+                                        height: "auto",
+                                      }
+                                }
+                                onClick={(event) =>
+                                  event.stopPropagation()
+                                }
+                              />
+                            </div>
+                          </div>
+
+                          <div
+                            className="mx-auto mt-3 flex w-full max-w-[560px] shrink-0 items-center gap-2 rounded-full border border-white/20 bg-black/80 px-3 py-2 text-white shadow-2xl backdrop-blur-md"
+                            onClick={(event) =>
+                              event.stopPropagation()
+                            }
                           >
                             <button
                               type="button"
@@ -334,13 +389,13 @@ function WisdomPoetry() {
                                   Number(event.target.value)
                                 )
                               }
-                              className="w-20 cursor-pointer sm:w-36"
+                              className="min-w-0 flex-1 cursor-pointer"
                               aria-label="Image zoom"
                               title="Image zoom"
                             />
 
                             <span
-                              className="min-w-[52px] text-center text-sm font-semibold tabular-nums"
+                              className="min-w-[58px] text-center text-sm font-semibold tabular-nums"
                               aria-live="polite"
                             >
                               {imageZoom}%
@@ -363,7 +418,9 @@ function WisdomPoetry() {
 
                             <button
                               type="button"
-                              onClick={() => setImageZoom(100)}
+                              onClick={() =>
+                                setImageZoom(100)
+                              }
                               disabled={imageZoom === 100}
                               className="shrink-0 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
                               aria-label="Reset zoom"
@@ -372,33 +429,9 @@ function WisdomPoetry() {
                               Reset
                             </button>
                           </div>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                            setIsImageOpen(false);
-                            setImageZoom(100);
-                          }}
-                            className="fixed right-4 top-4 z-[10000] flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/70 text-3xl text-white shadow-xl transition hover:bg-white hover:text-black"
-                            aria-label="Close enlarged image"
-                            title="Close image"
-                          >
-                            ×
-                          </button>
-
-                          <img
-                            src={`${API_URL}${poem.imageUrl}`}
-                            alt={
-                              poem.title ||
-                              poem.author ||
-                              "Wisdom poetry"
-                            }
-                            className="max-h-[92vh] max-w-[96vw] rounded-xl object-contain shadow-2xl transition-transform duration-200 ease-out"
-                            style={{ transform: `scale(${imageZoom / 100})`, transformOrigin: "center center" }}
-                            onClick={(event) => event.stopPropagation()}
-                          />
                         </div>
                       )}
+
                     </>
                   )}
 
