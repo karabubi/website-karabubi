@@ -68,6 +68,7 @@ function WisdomPoetry() {
     useState(null);
 
   const [isImageOpen, setIsImageOpen] = useState(false);
+  const [imageZoom, setImageZoom] = useState(100);
 
   const [loading, setLoading] =
     useState(true);
@@ -272,7 +273,10 @@ function WisdomPoetry() {
                       <div className="mb-8 w-full overflow-hidden rounded-[26px] border border-white/[0.08] bg-slate-950/70 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
                         <button
                           type="button"
-                          onClick={() => setIsImageOpen(true)}
+                          onClick={() => {
+                          setImageZoom(100);
+                          setIsImageOpen(true);
+                        }}
                           className="block w-full cursor-zoom-in rounded-[20px] focus:outline-none focus:ring-2 focus:ring-violet-400/70"
                           aria-label="Enlarge poetry image"
                           title="Click to enlarge"
@@ -291,15 +295,90 @@ function WisdomPoetry() {
 
                       {isImageOpen && (
                         <div
-                          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+                          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-auto bg-black/90 p-4 backdrop-blur-sm"
                           role="dialog"
                           aria-modal="true"
                           aria-label="Enlarged poetry image"
-                          onClick={() => setIsImageOpen(false)}
+                          onClick={() => {
+                            setIsImageOpen(false);
+                            setImageZoom(100);
+                          }}
                         >
+                          <div
+                            className="fixed bottom-5 left-1/2 z-[10000] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-full border border-white/20 bg-black/80 px-3 py-2 text-white shadow-2xl backdrop-blur-md"
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setImageZoom((zoom) =>
+                                  Math.max(100, zoom - 10)
+                                )
+                              }
+                              disabled={imageZoom <= 100}
+                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-2xl transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+                              aria-label="Zoom out"
+                              title="Zoom out"
+                            >
+                              −
+                            </button>
+
+                            <input
+                              type="range"
+                              min="100"
+                              max="200"
+                              step="10"
+                              value={imageZoom}
+                              onChange={(event) =>
+                                setImageZoom(
+                                  Number(event.target.value)
+                                )
+                              }
+                              className="w-20 cursor-pointer sm:w-36"
+                              aria-label="Image zoom"
+                              title="Image zoom"
+                            />
+
+                            <span
+                              className="min-w-[52px] text-center text-sm font-semibold tabular-nums"
+                              aria-live="polite"
+                            >
+                              {imageZoom}%
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setImageZoom((zoom) =>
+                                  Math.min(200, zoom + 10)
+                                )
+                              }
+                              disabled={imageZoom >= 200}
+                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-2xl transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+                              aria-label="Zoom in"
+                              title="Zoom in"
+                            >
+                              +
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setImageZoom(100)}
+                              disabled={imageZoom === 100}
+                              className="shrink-0 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+                              aria-label="Reset zoom"
+                              title="Reset zoom"
+                            >
+                              Reset
+                            </button>
+                          </div>
+
                           <button
                             type="button"
-                            onClick={() => setIsImageOpen(false)}
+                            onClick={() => {
+                            setIsImageOpen(false);
+                            setImageZoom(100);
+                          }}
                             className="fixed right-4 top-4 z-[10000] flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/70 text-3xl text-white shadow-xl transition hover:bg-white hover:text-black"
                             aria-label="Close enlarged image"
                             title="Close image"
@@ -314,7 +393,8 @@ function WisdomPoetry() {
                               poem.author ||
                               "Wisdom poetry"
                             }
-                            className="max-h-[92vh] max-w-[96vw] rounded-xl object-contain shadow-2xl"
+                            className="max-h-[92vh] max-w-[96vw] rounded-xl object-contain shadow-2xl transition-transform duration-200 ease-out"
+                            style={{ transform: `scale(${imageZoom / 100})`, transformOrigin: "center center" }}
                             onClick={(event) => event.stopPropagation()}
                           />
                         </div>
