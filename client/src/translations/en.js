@@ -12,6 +12,8 @@ const en = {
     manageWisdom: "Manage Wisdom",
     poetry: "Poetry",
     managePoetry: "Manage Poetry",
+    videos: "Videos",
+    manageVideos: "Manage Videos",
   },
 
 

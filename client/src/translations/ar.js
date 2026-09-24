@@ -12,6 +12,8 @@ const ar = {
     manageWisdom: "إدارة الحِكم",
     poetry: "الشعر",
     managePoetry: "إدارة الشعر",
+    videos: "الفيديوهات",
+    manageVideos: "إدارة الفيديوهات",
   },
 
 

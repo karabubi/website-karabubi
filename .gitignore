@@ -85,3 +85,6 @@ server/storage/private-documents/*
 server/storage/wisdom-poetry-images/
 
 server/storage/wisdom-images/
+
+# Local video uploads
+server/storage/videos/

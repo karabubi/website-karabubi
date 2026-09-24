@@ -17,6 +17,8 @@ import Wisdom from "./components/Wisdom";
 import AdminWisdom from "./components/AdminWisdom";
 import WisdomPoetry from "./components/WisdomPoetry";
 import AdminWisdomPoetry from "./components/AdminWisdomPoetry";
+import Videos from "./components/Videos";
+import AdminVideos from "./components/AdminVideos";
 
 import { AuthProvider } from "./context/AuthContext";
 
@@ -36,6 +38,8 @@ function App() {
           <Route path="/admin/wisdom" element={<AdminWisdom />} />
           <Route path="/wisdom-poetry" element={<WisdomPoetry />} />
           <Route path="/admin/wisdom-poetry" element={<AdminWisdomPoetry />} />
+          <Route path="/videos" element={<Videos />} />
+          <Route path="/admin/videos" element={<AdminVideos />} />
           <Route path="/private" element={<Private />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />

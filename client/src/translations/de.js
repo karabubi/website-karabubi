@@ -12,6 +12,8 @@ const de = {
     manageWisdom: "Weisheiten verwalten",
     poetry: "Poesie",
     managePoetry: "Poesie verwalten",
+    videos: "Videos",
+    manageVideos: "Videos verwalten",
   },
 
 
