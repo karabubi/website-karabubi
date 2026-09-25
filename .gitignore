@@ -88,3 +88,5 @@ server/storage/wisdom-images/
 
 # Local video uploads
 server/storage/videos/
+
+server/storage/images/

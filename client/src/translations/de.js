@@ -13,7 +13,9 @@ const de = {
     poetry: "Poesie",
     managePoetry: "Poesie verwalten",
     videos: "Videos",
+    gallery: "Galerie",
     manageVideos: "Videos verwalten",
+    manageGallery: "Galerie verwalten",
   },
 
 

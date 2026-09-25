@@ -90,6 +90,12 @@ function Navbar() {
             >
               {t.nav.videos}
             </NavLink>
+<NavLink
+              to="/gallery"
+              className={navClass}
+            >
+              {t.nav.gallery}
+            </NavLink>
         </nav>
 
         <div className="flex max-w-[720px] shrink flex-row flex-wrap items-center justify-end gap-2 whitespace-nowrap max-[900px]:ms-auto max-[900px]:min-w-0 max-[900px]:shrink max-[900px]:gap-2 max-[640px]:gap-1.5">
@@ -136,6 +142,12 @@ function Navbar() {
                     className="rounded-xl border border-violet-500/40 bg-violet-500/10 px-3.5 py-2.5 font-semibold text-violet-300 no-underline transition-colors hover:bg-violet-500/20 hover:text-violet-200 max-[1500px]:px-2.5 max-[1500px]:text-[0.82rem] max-[640px]:px-2.5 max-[640px]:py-2 max-[640px]:text-[0.82rem]"
                   >
                     {t.nav.manageVideos}
+                  </Link>
+<Link
+                    to="/admin/gallery"
+                    className="rounded-xl border border-violet-500/40 bg-violet-500/10 px-3.5 py-2.5 font-semibold text-violet-300 no-underline transition-colors hover:bg-violet-500/20 hover:text-violet-200 max-[1500px]:px-2.5 max-[1500px]:text-[0.82rem] max-[640px]:px-2.5 max-[640px]:py-2 max-[640px]:text-[0.82rem]"
+                  >
+                    {t.nav.manageGallery}
                   </Link>
 
                   <Link

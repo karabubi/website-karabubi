@@ -4,6 +4,7 @@ const SiteVisit = require("./SiteVisit");
 const WisdomQuote = require("./WisdomQuote");
 const WisdomPoem = require("./WisdomPoem");
 const Video = require("./Video");
+const GalleryImage = require("./GalleryImage");
 
 module.exports = {
   sequelize,
@@ -12,4 +13,5 @@ module.exports = {
   WisdomQuote,
   WisdomPoem,
   Video,
+  GalleryImage,
 };

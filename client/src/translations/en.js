@@ -13,7 +13,9 @@ const en = {
     poetry: "Poetry",
     managePoetry: "Manage Poetry",
     videos: "Videos",
+    gallery: "Gallery",
     manageVideos: "Manage Videos",
+    manageGallery: "Manage Gallery",
   },
 
 

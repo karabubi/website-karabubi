@@ -13,7 +13,9 @@ const ar = {
     poetry: "الشعر",
     managePoetry: "إدارة الشعر",
     videos: "الفيديوهات",
+    gallery: "معرض الصور",
     manageVideos: "إدارة الفيديوهات",
+    manageGallery: "إدارة معرض الصور",
   },
 
 
