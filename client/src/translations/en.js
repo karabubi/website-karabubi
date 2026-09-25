@@ -283,6 +283,56 @@ const en = {
     modernWebApplications: "Modern web applications",
   },
 
+
+  "videosPage": {
+  "badge": "VIDEO CHANNEL",
+  "title": "Videos",
+  "intro": "Watch videos directly from the channel. Use the player controls to play, pause, change volume, seek through the video, or enter fullscreen mode.",
+  "loading": "Loading videos...",
+  "empty": "No videos are available yet.",
+  "loadError": "Could not load videos."
+},
+  "adminVideos": {
+  "badge": "ADMIN · VIDEO CHANNEL",
+  "title": "Manage Videos",
+  "intro": "Upload videos, edit titles and descriptions, replace video files, or delete videos from the public channel.",
+  "editVideo": "Edit Video",
+  "uploadNewVideo": "Upload New Video",
+  "titleLabel": "Title",
+  "titlePlaceholder": "Enter video title",
+  "descriptionLabel": "Description",
+  "descriptionPlaceholder": "Optional video description",
+  "replaceVideoFile": "Replace Video File",
+  "videoFile": "Video File",
+  "fileHelp": "MP4 or WEBM · maximum 200 MB.",
+  "keepExisting": " Leave empty to keep the existing video.",
+  "selected": "Selected:",
+  "size": "Size:",
+  "preview": "Video Preview",
+  "clearSelected": "Clear Selected Video",
+  "saveChanges": "Save Changes",
+  "uploadVideo": "Upload Video",
+  "cancelEdit": "Cancel Edit",
+  "savedVideos": "Saved Videos",
+  "loadingVideos": "Loading videos...",
+  "noVideos": "No videos have been saved yet.",
+  "edit": "Edit",
+  "delete": "Delete",
+  "chooseMp4Webm": "Please choose an MP4 or WEBM video.",
+  "maxSizeError": "Video must not exceed 200 MB.",
+  "titleRequired": "Please enter a video title.",
+  "titleTooLong": "Video title must not exceed 200 characters.",
+  "descriptionTooLong": "Video description must not exceed 5000 characters.",
+  "loadError": "Could not load videos.",
+  "saveError": "Could not save video.",
+  "deleteError": "Could not delete video.",
+  "uploadSuccess": "Video uploaded successfully.",
+  "updateReplacementSuccess": "Video updated successfully. Replacement video uploaded.",
+  "updateKeepSuccess": "Video updated successfully. Existing video kept.",
+  "deleteSuccess": "Video deleted successfully.",
+  "deleteConfirmPrefix": "Delete",
+  "deleteConfirmSuffix": "? This will also delete the uploaded video file."
+}
 };
 
 export default en;

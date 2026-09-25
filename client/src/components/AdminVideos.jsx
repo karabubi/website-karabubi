@@ -1,3 +1,4 @@
+import { useLanguage } from "../context/LanguageContext";
 import {
   useCallback,
   useEffect,
@@ -134,6 +135,7 @@ async function videoRequest(
 }
 
 function AdminVideos() {
+  const { t } = useLanguage();
   const {
     user,
     loading: authLoading,
@@ -200,7 +202,7 @@ function AdminVideos() {
       } catch (requestError) {
         setError(
           requestError.message ||
-            "Could not load videos."
+            t.adminVideos.loadError
         );
       } finally {
         setLoading(false);
@@ -307,7 +309,7 @@ function AdminVideos() {
           "";
 
         setError(
-          "Please choose an MP4 or WEBM video."
+          t.adminVideos.chooseMp4Webm
         );
 
         return;
@@ -321,7 +323,7 @@ function AdminVideos() {
           "";
 
         setError(
-          "Video must not exceed 200 MB."
+          t.adminVideos.maxSizeError
         );
 
         return;
@@ -384,7 +386,7 @@ function AdminVideos() {
 
       if (!cleanTitle) {
         setError(
-          "Please enter a video title."
+          t.adminVideos.titleRequired
         );
 
         return;
@@ -395,7 +397,7 @@ function AdminVideos() {
         200
       ) {
         setError(
-          "Video title must not exceed 200 characters."
+          t.adminVideos.titleTooLong
         );
 
         return;
@@ -406,7 +408,7 @@ function AdminVideos() {
           .length > 5000
       ) {
         setError(
-          "Video description must not exceed 5000 characters."
+          t.adminVideos.descriptionTooLong
         );
 
         return;
@@ -449,7 +451,7 @@ function AdminVideos() {
         )
       ) {
         setError(
-          "Please choose an MP4 or WEBM video."
+          t.adminVideos.chooseMp4Webm
         );
 
         return;
@@ -461,7 +463,7 @@ function AdminVideos() {
           MAX_VIDEO_SIZE
       ) {
         setError(
-          "Video must not exceed 200 MB."
+          t.adminVideos.maxSizeError
         );
 
         return;
@@ -498,8 +500,8 @@ function AdminVideos() {
 
           setMessage(
             data.replacedVideo
-              ? "Video updated successfully. Replacement video uploaded."
-              : "Video updated successfully. Existing video kept."
+              ? t.adminVideos.updateReplacementSuccess
+              : t.adminVideos.updateKeepSuccess
           );
         } else {
           await videoRequest(
@@ -511,7 +513,7 @@ function AdminVideos() {
           );
 
           setMessage(
-            "Video uploaded successfully."
+            t.adminVideos.uploadSuccess
           );
         }
 
@@ -521,7 +523,7 @@ function AdminVideos() {
       } catch (requestError) {
         setError(
           requestError.message ||
-            "Could not save video."
+            t.adminVideos.saveError
         );
       } finally {
         setSaving(false);
@@ -532,7 +534,7 @@ function AdminVideos() {
     async (video) => {
       const confirmed =
         window.confirm(
-          `Delete "${video.title}"? This will also delete the uploaded video file.`
+          `${t.adminVideos.deleteConfirmPrefix} "${video.title}"${t.adminVideos.deleteConfirmSuffix}`
         );
 
       if (!confirmed) {
@@ -558,14 +560,14 @@ function AdminVideos() {
         }
 
         setMessage(
-          "Video deleted successfully."
+          t.adminVideos.deleteSuccess
         );
 
         await loadVideos();
       } catch (requestError) {
         setError(
           requestError.message ||
-            "Could not delete video."
+            t.adminVideos.deleteError
         );
       }
     };
@@ -578,28 +580,20 @@ function AdminVideos() {
     <main className="min-h-[calc(100vh-86px)] bg-slate-950 px-4 py-12 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <section className="mb-10">
-          <div className="mb-3 inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-300">
-            ADMIN · VIDEO CHANNEL
-          </div>
+          <div className="mb-3 inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-300">{t.adminVideos.badge}</div>
 
-          <h1 className="text-3xl font-bold sm:text-4xl">
-            Manage Videos
-          </h1>
+          <h1 className="text-3xl font-bold sm:text-4xl">{t.adminVideos.title}</h1>
 
           <p className="mt-3 max-w-2xl text-slate-400">
-            Upload videos, edit
-            titles and descriptions,
-            replace video files, or
-            delete videos from the
-            public channel.
+            {t.adminVideos.intro}
           </p>
         </section>
 
         <section className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl sm:p-8">
           <h2 className="text-xl font-bold">
             {editingId
-              ? "Edit Video"
-              : "Upload New Video"}
+              ? t.adminVideos.editVideo
+              : t.adminVideos.uploadNewVideo}
           </h2>
 
           <form
@@ -613,9 +607,7 @@ function AdminVideos() {
               <label
                 htmlFor="video-title"
                 className="mb-2 block text-sm font-semibold text-slate-200"
-              >
-                Title
-              </label>
+              >{t.adminVideos.titleLabel}</label>
 
               <input
                 id="video-title"
@@ -629,7 +621,7 @@ function AdminVideos() {
                         .value
                     )
                 }
-                placeholder="Enter video title"
+                placeholder={t.adminVideos.titlePlaceholder}
                 className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
               />
             </div>
@@ -638,9 +630,7 @@ function AdminVideos() {
               <label
                 htmlFor="video-description"
                 className="mb-2 block text-sm font-semibold text-slate-200"
-              >
-                Description
-              </label>
+              >{t.adminVideos.descriptionLabel}</label>
 
               <textarea
                 id="video-description"
@@ -656,7 +646,7 @@ function AdminVideos() {
                         .value
                     )
                 }
-                placeholder="Optional video description"
+                placeholder={t.adminVideos.descriptionPlaceholder}
                 className="w-full resize-y rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
               />
             </div>
@@ -667,15 +657,14 @@ function AdminVideos() {
                 className="mb-2 block text-sm font-semibold text-slate-200"
               >
                 {editingId
-                  ? "Replace Video File"
-                  : "Video File"}
+                  ? t.adminVideos.replaceVideoFile
+                  : t.adminVideos.videoFile}
               </label>
 
               <p className="mb-3 text-sm text-slate-400">
-                MP4 or WEBM · maximum
-                200 MB.
+                {t.adminVideos.fileHelp}
                 {editingId
-                  ? " Leave empty to keep the existing video."
+                  ? t.adminVideos.keepExisting
                   : ""}
               </p>
 
@@ -716,9 +705,7 @@ function AdminVideos() {
 
             {currentPreview && (
               <div>
-                <p className="mb-3 text-sm font-semibold text-slate-200">
-                  Video Preview
-                </p>
+                <p className="mb-3 text-sm font-semibold text-slate-200">{t.adminVideos.preview}</p>
 
                 <video
                   key={
@@ -750,9 +737,7 @@ function AdminVideos() {
                       }
                     }}
                     className="mt-3 rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-500 hover:text-white"
-                  >
-                    Clear Selected Video
-                  </button>
+                  >{t.adminVideos.clearSelected}</button>
                 )}
               </div>
             )}
@@ -778,8 +763,8 @@ function AdminVideos() {
                 {saving
                   ? "Saving..."
                   : editingId
-                    ? "Save Changes"
-                    : "Upload Video"}
+                    ? t.adminVideos.saveChanges
+                    : t.adminVideos.uploadVideo}
               </button>
 
               {editingId && (
@@ -799,9 +784,7 @@ function AdminVideos() {
 
         <section className="mt-10">
           <div className="mb-5 flex items-center justify-between gap-4">
-            <h2 className="text-2xl font-bold">
-              Saved Videos
-            </h2>
+            <h2 className="text-2xl font-bold">{t.adminVideos.savedVideos}</h2>
 
             <span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-sm text-slate-400">
               {videos.length}
@@ -810,7 +793,7 @@ function AdminVideos() {
 
           {loading ? (
             <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-8 text-center text-slate-400">
-              Loading videos...
+              {t.adminVideos.loadingVideos}
             </div>
           ) : videos.length === 0 ? (
             <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-10 text-center text-slate-400">
@@ -874,9 +857,7 @@ function AdminVideos() {
                             )
                           }
                           className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
-                        >
-                          Edit
-                        </button>
+                        >{t.adminVideos.edit}</button>
 
                         <button
                           type="button"
@@ -886,9 +867,7 @@ function AdminVideos() {
                             )
                           }
                           className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-500/20"
-                        >
-                          Delete
-                        </button>
+                        >{t.adminVideos.delete}</button>
                       </div>
                     </div>
                   </article>

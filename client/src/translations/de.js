@@ -283,6 +283,56 @@ const de = {
     modernWebApplications: "Moderne Webanwendungen",
   },
 
+
+  "videosPage": {
+  "badge": "VIDEO-KANAL",
+  "title": "Videos",
+  "intro": "Sehen Sie Videos direkt im Kanal an. Mit den Steuerelementen können Sie das Video abspielen, pausieren, die Lautstärke ändern, innerhalb des Videos navigieren oder in den Vollbildmodus wechseln.",
+  "loading": "Videos werden geladen...",
+  "empty": "Noch keine Videos verfügbar.",
+  "loadError": "Videos konnten nicht geladen werden."
+},
+  "adminVideos": {
+  "badge": "ADMIN · VIDEO-KANAL",
+  "title": "Videos verwalten",
+  "intro": "Laden Sie Videos hoch, bearbeiten Sie Titel und Beschreibungen, ersetzen Sie Videodateien oder löschen Sie Videos aus dem öffentlichen Kanal.",
+  "editVideo": "Video bearbeiten",
+  "uploadNewVideo": "Neues Video hochladen",
+  "titleLabel": "Titel",
+  "titlePlaceholder": "Videotitel eingeben",
+  "descriptionLabel": "Beschreibung",
+  "descriptionPlaceholder": "Optionale Videobeschreibung",
+  "replaceVideoFile": "Videodatei ersetzen",
+  "videoFile": "Videodatei",
+  "fileHelp": "MP4 oder WEBM · maximal 200 MB.",
+  "keepExisting": " Leer lassen, um das vorhandene Video zu behalten.",
+  "selected": "Ausgewählt:",
+  "size": "Größe:",
+  "preview": "Videovorschau",
+  "clearSelected": "Ausgewähltes Video entfernen",
+  "saveChanges": "Änderungen speichern",
+  "uploadVideo": "Video hochladen",
+  "cancelEdit": "Bearbeitung abbrechen",
+  "savedVideos": "Gespeicherte Videos",
+  "loadingVideos": "Videos werden geladen...",
+  "noVideos": "Noch keine Videos gespeichert.",
+  "edit": "Bearbeiten",
+  "delete": "Löschen",
+  "chooseMp4Webm": "Bitte wählen Sie ein MP4- oder WEBM-Video aus.",
+  "maxSizeError": "Das Video darf maximal 200 MB groß sein.",
+  "titleRequired": "Bitte geben Sie einen Videotitel ein.",
+  "titleTooLong": "Der Videotitel darf höchstens 200 Zeichen lang sein.",
+  "descriptionTooLong": "Die Videobeschreibung darf höchstens 5000 Zeichen lang sein.",
+  "loadError": "Videos konnten nicht geladen werden.",
+  "saveError": "Das Video konnte nicht gespeichert werden.",
+  "deleteError": "Das Video konnte nicht gelöscht werden.",
+  "uploadSuccess": "Video erfolgreich hochgeladen.",
+  "updateReplacementSuccess": "Video erfolgreich aktualisiert. Die neue Videodatei wurde hochgeladen.",
+  "updateKeepSuccess": "Video erfolgreich aktualisiert. Die vorhandene Videodatei wurde beibehalten.",
+  "deleteSuccess": "Video erfolgreich gelöscht.",
+  "deleteConfirmPrefix": "Möchten Sie",
+  "deleteConfirmSuffix": " wirklich löschen? Dadurch wird auch die hochgeladene Videodatei gelöscht."
+}
 };
 
 export default de;
