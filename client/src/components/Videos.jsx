@@ -48,8 +48,69 @@ function formatVideoSize(bytes) {
   ).toFixed(1)} MB`;
 }
 
+function getLocalizedTitle(
+  video,
+  language
+) {
+  if (language === "de") {
+    return (
+      video.titleDe ||
+      video.titleEn ||
+      video.title ||
+      ""
+    );
+  }
+
+  if (language === "ar") {
+    return (
+      video.titleAr ||
+      video.titleEn ||
+      video.title ||
+      ""
+    );
+  }
+
+  return (
+    video.titleEn ||
+    video.title ||
+    ""
+  );
+}
+
+function getLocalizedDescription(
+  video,
+  language
+) {
+  if (language === "de") {
+    return (
+      video.descriptionDe ||
+      video.descriptionEn ||
+      video.description ||
+      ""
+    );
+  }
+
+  if (language === "ar") {
+    return (
+      video.descriptionAr ||
+      video.descriptionEn ||
+      video.description ||
+      ""
+    );
+  }
+
+  return (
+    video.descriptionEn ||
+    video.description ||
+    ""
+  );
+}
+
 function Videos() {
-  const { t } = useLanguage();
+  const {
+    t,
+    language,
+  } = useLanguage();
   const [videos, setVideos] =
     useState([]);
 
@@ -183,14 +244,12 @@ function Videos() {
 
                   <div className="p-6">
                     <h2 className="text-xl font-bold text-white">
-                      {video.title}
+                      {getLocalizedTitle(video, language)}
                     </h2>
 
-                    {video.description && (
+                    {getLocalizedDescription(video, language) && (
                       <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-300">
-                        {
-                          video.description
-                        }
+                        {getLocalizedDescription(video, language)}
                       </p>
                     )}
 

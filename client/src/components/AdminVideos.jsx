@@ -153,6 +153,26 @@ function AdminVideos() {
   ] = useState("");
 
   const [
+    titleDe,
+    setTitleDe,
+  ] = useState("");
+
+  const [
+    titleAr,
+    setTitleAr,
+  ] = useState("");
+
+  const [
+    descriptionDe,
+    setDescriptionDe,
+  ] = useState("");
+
+  const [
+    descriptionAr,
+    setDescriptionAr,
+  ] = useState("");
+
+  const [
     editingId,
     setEditingId,
   ] = useState(null);
@@ -275,7 +295,12 @@ function AdminVideos() {
     clearPreview();
 
     setTitle("");
+    setTitleDe("");
+    setTitleAr("");
+
     setDescription("");
+    setDescriptionDe("");
+    setDescriptionAr("");
     setEditingId(null);
     setVideoFile(null);
 
@@ -479,6 +504,36 @@ function AdminVideos() {
         description.trim()
       );
 
+      formData.set(
+        "titleEn",
+        cleanTitle
+      );
+
+      formData.set(
+        "titleDe",
+        titleDe.trim()
+      );
+
+      formData.set(
+        "titleAr",
+        titleAr.trim()
+      );
+
+      formData.set(
+        "descriptionEn",
+        description.trim()
+      );
+
+      formData.set(
+        "descriptionDe",
+        descriptionDe.trim()
+      );
+
+      formData.set(
+        "descriptionAr",
+        descriptionAr.trim()
+      );
+
       if (!selectedFile) {
         formData.delete(
           "video"
@@ -603,52 +658,166 @@ function AdminVideos() {
             encType="multipart/form-data"
             className="mt-6 space-y-6"
           >
-            <div>
-              <label
-                htmlFor="video-title"
-                className="mb-2 block text-sm font-semibold text-slate-200"
-              >{t.adminVideos.titleLabel}</label>
+            <div className="grid gap-5 lg:grid-cols-3">
+              <div>
+                <label
+                  htmlFor="video-title"
+                  className="mb-2 block text-sm font-semibold text-slate-200"
+                >
+                  {t.adminVideos.titleEnglish}
+                </label>
 
-              <input
-                id="video-title"
-                type="text"
-                value={title}
-                maxLength={200}
-                onChange={
-                  (event) =>
+                <input
+                  id="video-title"
+                  type="text"
+                  value={title}
+                  onChange={(event) =>
                     setTitle(
-                      event.target
-                        .value
+                      event.target.value
                     )
-                }
-                placeholder={t.adminVideos.titlePlaceholder}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
-              />
+                  }
+                  placeholder={
+                    t.adminVideos
+                      .titlePlaceholder
+                  }
+                  maxLength={200}
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="video-title-de"
+                  className="mb-2 block text-sm font-semibold text-slate-200"
+                >
+                  {t.adminVideos.titleGerman}
+                </label>
+
+                <input
+                  id="video-title-de"
+                  type="text"
+                  value={titleDe}
+                  onChange={(event) =>
+                    setTitleDe(
+                      event.target.value
+                    )
+                  }
+                  placeholder={
+                    t.adminVideos
+                      .titleGermanPlaceholder
+                  }
+                  maxLength={200}
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="video-title-ar"
+                  className="mb-2 block text-sm font-semibold text-slate-200"
+                >
+                  {t.adminVideos.titleArabic}
+                </label>
+
+                <input
+                  id="video-title-ar"
+                  type="text"
+                  dir="rtl"
+                  value={titleAr}
+                  onChange={(event) =>
+                    setTitleAr(
+                      event.target.value
+                    )
+                  }
+                  placeholder={
+                    t.adminVideos
+                      .titleArabicPlaceholder
+                  }
+                  maxLength={200}
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-right text-white outline-none transition focus:border-cyan-400"
+                />
+              </div>
             </div>
 
-            <div>
-              <label
-                htmlFor="video-description"
-                className="mb-2 block text-sm font-semibold text-slate-200"
-              >{t.adminVideos.descriptionLabel}</label>
+            <div className="grid gap-5 lg:grid-cols-3">
+              <div>
+                <label
+                  htmlFor="video-description"
+                  className="mb-2 block text-sm font-semibold text-slate-200"
+                >
+                  {t.adminVideos.descriptionEnglish}
+                </label>
 
-              <textarea
-                id="video-description"
-                value={
-                  description
-                }
-                maxLength={5000}
-                rows={5}
-                onChange={
-                  (event) =>
+                <textarea
+                  id="video-description"
+                  value={description}
+                  onChange={(event) =>
                     setDescription(
-                      event.target
-                        .value
+                      event.target.value
                     )
-                }
-                placeholder={t.adminVideos.descriptionPlaceholder}
-                className="w-full resize-y rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
-              />
+                  }
+                  placeholder={
+                    t.adminVideos
+                      .descriptionPlaceholder
+                  }
+                  maxLength={5000}
+                  rows={6}
+                  className="w-full resize-y rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="video-description-de"
+                  className="mb-2 block text-sm font-semibold text-slate-200"
+                >
+                  {t.adminVideos.descriptionGerman}
+                </label>
+
+                <textarea
+                  id="video-description-de"
+                  value={descriptionDe}
+                  onChange={(event) =>
+                    setDescriptionDe(
+                      event.target.value
+                    )
+                  }
+                  placeholder={
+                    t.adminVideos
+                      .descriptionGermanPlaceholder
+                  }
+                  maxLength={5000}
+                  rows={6}
+                  className="w-full resize-y rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="video-description-ar"
+                  className="mb-2 block text-sm font-semibold text-slate-200"
+                >
+                  {t.adminVideos.descriptionArabic}
+                </label>
+
+                <textarea
+                  id="video-description-ar"
+                  dir="rtl"
+                  value={descriptionAr}
+                  onChange={(event) =>
+                    setDescriptionAr(
+                      event.target.value
+                    )
+                  }
+                  placeholder={
+                    t.adminVideos
+                      .descriptionArabicPlaceholder
+                  }
+                  maxLength={5000}
+                  rows={6}
+                  className="w-full resize-y rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-right text-white outline-none transition focus:border-cyan-400"
+                />
+              </div>
             </div>
 
             <div>

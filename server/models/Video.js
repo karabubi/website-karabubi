@@ -26,6 +26,37 @@ const Video =
         allowNull: true,
       },
 
+      titleEn: {
+        type: DataTypes.STRING(200),
+        allowNull: true,
+      },
+
+      titleDe: {
+        type: DataTypes.STRING(200),
+        allowNull: true,
+      },
+
+      titleAr: {
+        type: DataTypes.STRING(200),
+        allowNull: true,
+      },
+
+      descriptionEn: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      descriptionDe: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      descriptionAr: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+
       videoFilename: {
         type: DataTypes.STRING(255),
         allowNull: false,

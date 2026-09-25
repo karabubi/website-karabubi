@@ -111,6 +111,40 @@ const validateVideoText =
     return null;
   };
 
+const validateTranslatedVideoText =
+  (
+    titleDe,
+    titleAr,
+    descriptionDe,
+    descriptionAr
+  ) => {
+    if (
+      titleDe.length >
+        MAX_TITLE_LENGTH ||
+      titleAr.length >
+        MAX_TITLE_LENGTH
+    ) {
+      return (
+        "Translated video titles must not exceed " +
+        `${MAX_TITLE_LENGTH} characters.`
+      );
+    }
+
+    if (
+      descriptionDe.length >
+        MAX_DESCRIPTION_LENGTH ||
+      descriptionAr.length >
+        MAX_DESCRIPTION_LENGTH
+    ) {
+      return (
+        "Translated video descriptions must not exceed " +
+        `${MAX_DESCRIPTION_LENGTH} characters.`
+      );
+    }
+
+    return null;
+  };
+
 const isSafeFilename =
   (filename) => {
     if (!filename) {
@@ -646,20 +680,58 @@ router.post(
     req,
     res
   ) => {
-    const title =
+    const titleEn =
       normalizeTitle(
-        req.body.title
+        req.body.titleEn ??
+          req.body.title
       );
 
-    const description =
-      normalizeDescription(
-        req.body.description
+    const titleDe =
+      normalizeTitle(
+        req.body.titleDe
       );
+
+    const titleAr =
+      normalizeTitle(
+        req.body.titleAr
+      );
+
+    const descriptionEn =
+      normalizeDescription(
+        req.body.descriptionEn ??
+          req.body.description
+      );
+
+    const descriptionDe =
+      normalizeDescription(
+        req.body.descriptionDe
+      );
+
+    const descriptionAr =
+      normalizeDescription(
+        req.body.descriptionAr
+      );
+
+    /*
+     * Keep legacy title / description
+     * synchronized with English.
+     */
+    const title =
+      titleEn;
+
+    const description =
+      descriptionEn;
 
     const validationError =
       validateVideoText(
         title,
         description
+      ) ||
+      validateTranslatedVideoText(
+        titleDe,
+        titleAr,
+        descriptionDe,
+        descriptionAr
       );
 
     if (validationError) {
@@ -695,6 +767,24 @@ router.post(
 
           description:
             description || null,
+
+          titleEn:
+            titleEn || null,
+
+          titleDe:
+            titleDe || null,
+
+          titleAr:
+            titleAr || null,
+
+          descriptionEn:
+            descriptionEn || null,
+
+          descriptionDe:
+            descriptionDe || null,
+
+          descriptionAr:
+            descriptionAr || null,
 
           videoFilename:
             req.file.filename,
@@ -789,29 +879,93 @@ router.patch(
         });
     }
 
-    const title =
-      req.body.title ===
-      undefined
-        ? video.title
-        : normalizeTitle(
-            req.body.title
-          );
-
-    const description =
-      req.body.description ===
+    const titleEn =
+      req.body.titleEn ===
       undefined
         ? (
+            video.titleEn ||
+            video.title ||
+            ""
+          )
+        : normalizeTitle(
+            req.body.titleEn
+          );
+
+    const titleDe =
+      req.body.titleDe ===
+      undefined
+        ? (
+            video.titleDe ||
+            ""
+          )
+        : normalizeTitle(
+            req.body.titleDe
+          );
+
+    const titleAr =
+      req.body.titleAr ===
+      undefined
+        ? (
+            video.titleAr ||
+            ""
+          )
+        : normalizeTitle(
+            req.body.titleAr
+          );
+
+    const descriptionEn =
+      req.body.descriptionEn ===
+      undefined
+        ? (
+            video.descriptionEn ||
             video.description ||
             ""
           )
         : normalizeDescription(
-            req.body.description
+            req.body.descriptionEn
           );
+
+    const descriptionDe =
+      req.body.descriptionDe ===
+      undefined
+        ? (
+            video.descriptionDe ||
+            ""
+          )
+        : normalizeDescription(
+            req.body.descriptionDe
+          );
+
+    const descriptionAr =
+      req.body.descriptionAr ===
+      undefined
+        ? (
+            video.descriptionAr ||
+            ""
+          )
+        : normalizeDescription(
+            req.body.descriptionAr
+          );
+
+    /*
+     * Legacy fields remain English.
+     */
+    const title =
+      titleEn;
+
+    const description =
+      descriptionEn;
 
     const validationError =
       validateVideoText(
         title,
         description
+      ) ||
+      validateTranslatedVideoText(
+        titleDe,
+        titleAr,
+        descriptionDe,
+        descriptionAr
       );
 
     if (validationError) {
@@ -839,6 +993,24 @@ router.patch(
 
       video.description =
         description || null;
+
+      video.titleEn =
+        titleEn || null;
+
+      video.titleDe =
+        titleDe || null;
+
+      video.titleAr =
+        titleAr || null;
+
+      video.descriptionEn =
+        descriptionEn || null;
+
+      video.descriptionDe =
+        descriptionDe || null;
+
+      video.descriptionAr =
+        descriptionAr || null;
 
       if (req.file) {
         video.videoFilename =
