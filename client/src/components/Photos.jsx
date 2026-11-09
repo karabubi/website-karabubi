@@ -318,6 +318,53 @@ function Photos() {
           </aside>
         </header>
 
+
+        <section
+          data-featured-project="xc-agent-portal"
+          className="mt-16"
+        >
+          <div className="mb-6">
+            <span className="text-sm font-bold tracking-widest text-blue-400">
+              FEATURED PROJECT
+            </span>
+            <h2 className="mt-2 text-3xl font-bold text-white">
+              Latest Development
+            </h2>
+          </div>
+
+          <article className="rounded-3xl border border-blue-400/25 bg-slate-900/80 p-8 shadow-xl">
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <h3 className="text-2xl font-bold text-white">
+                XC Agent Portal
+              </h3>
+              <span className="rounded-full border border-blue-400/30 px-3 py-1 text-xs font-semibold text-blue-300">
+                Private Source Code
+              </span>
+            </div>
+
+            <p className="max-w-3xl leading-7 text-slate-400">
+              Full-stack financial transaction management demonstration
+              featuring a dashboard, payment tracking, account statements,
+              transaction management and CSV reporting.
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-2">
+              {["React", "TypeScript", "Tailwind CSS", "Express", "PostgreSQL", "Docker"].map((tech) => (
+                <span
+                  key={tech}
+                  className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+
+            <p className="mt-6 text-sm text-slate-500">
+              Local demonstration · Live demo not yet available
+            </p>
+          </article>
+        </section>
+
         <section className="mt-[92px]">
           <div className="mb-[25px] flex items-end justify-between gap-5 [&_h2]:mb-0 [&_h2]:mt-1.5 [&_h2]:text-[clamp(2rem,4vw,3rem)] [&_h2]:tracking-[-0.04em] [&_h2]:text-slate-50 [&_span]:text-[0.7rem] [&_span]:font-extrabold [&_span]:tracking-[0.15em] [&_span]:text-blue-400 [&>p]:m-0 [&>p]:text-[0.83rem] [&>p]:text-slate-500 max-[700px]:flex-col max-[700px]:items-start">
             <div>
