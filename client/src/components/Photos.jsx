@@ -1,3 +1,4 @@
+import XcAgentGallery from "./XcAgentGallery";
 import React, { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -362,6 +363,7 @@ function Photos() {
             <p className="mt-6 text-sm text-slate-500">
               Local demonstration · Live demo not yet available
             </p>
+                      <XcAgentGallery />
           </article>
         </section>
 
