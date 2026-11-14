@@ -597,7 +597,7 @@ function AdminVideos() {
           );
         } else {
           await videoRequest(
-            "/",
+            "",
             {
               method: "POST",
               body: formData,
