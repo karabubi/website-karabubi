@@ -116,18 +116,63 @@ async function videoRequest(
     );
 
   let data = {};
+  let rawText = "";
+
+  const contentType =
+    response.headers.get(
+      "content-type"
+    ) || "";
 
   try {
-    data =
-      await response.json();
-  } catch {
-    data = {};
+    if (
+      contentType.includes(
+        "application/json"
+      )
+    ) {
+      data =
+        await response.json();
+    } else {
+      rawText =
+        await response.text();
+    }
+  } catch (parseError) {
+    console.error(
+      "Video response parse error:",
+      parseError
+    );
   }
 
   if (!response.ok) {
+    console.error(
+      "VIDEO REQUEST FAILED",
+      {
+        status:
+          response.status,
+        statusText:
+          response.statusText,
+        data,
+        rawText,
+      }
+    );
+
     throw new Error(
       data.error ||
-        "Video request failed."
+      (
+        "Video upload failed (" +
+        response.status +
+        " " +
+        response.statusText +
+        ")" +
+        (
+          rawText
+            ? ": " +
+              rawText.slice(
+                0,
+                300
+              )
+            : ""
+        )
+      )
     );
   }
 
@@ -439,23 +484,13 @@ function AdminVideos() {
         return;
       }
 
-      const formElement =
-        event.currentTarget;
-
       const formData =
-        new FormData(
-          formElement
-        );
-
-      const formVideo =
-        formData.get(
-          "video"
-        );
+        new FormData();
 
       const selectedFile =
-        formVideo instanceof File &&
-        formVideo.size > 0
-          ? formVideo
+        videoFile instanceof File &&
+        videoFile.size > 0
+          ? videoFile
           : null;
 
       if (
@@ -534,9 +569,11 @@ function AdminVideos() {
         descriptionAr.trim()
       );
 
-      if (!selectedFile) {
-        formData.delete(
-          "video"
+      if (selectedFile) {
+        formData.set(
+          "video",
+          selectedFile,
+          selectedFile.name
         );
       }
 
