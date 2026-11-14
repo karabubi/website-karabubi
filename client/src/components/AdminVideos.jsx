@@ -259,7 +259,7 @@ function AdminVideos() {
 
       try {
         const data =
-          await videoRequest("/");
+          await videoRequest("");
 
         setVideos(
           data.videos || []
