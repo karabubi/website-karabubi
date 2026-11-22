@@ -497,29 +497,55 @@ function AdminLiteraryReflections() {
     };
 
   return (
-    <main className="min-h-[calc(100vh-86px)] bg-[#050816] px-6 py-14 text-slate-100">
-      <section className="mx-auto w-full max-w-6xl">
-        <span className="text-sm font-semibold uppercase tracking-[0.18em] text-violet-400">
-          Administration
-        </span>
+    <main className="relative isolate min-h-[calc(100vh-76px)] overflow-hidden bg-[#050816] px-4 py-10 text-slate-100 sm:px-6 sm:py-14 lg:px-8">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute -left-40 -top-48 h-[520px] w-[520px] rounded-full bg-violet-600/15 blur-[140px]" />
+        <div className="absolute -right-52 top-52 h-[560px] w-[560px] rounded-full bg-blue-600/10 blur-[150px]" />
+        <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)", backgroundSize: "56px 56px" }} />
+      </div>
 
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-white">
-          Literary Reflections
-        </h1>
+      <section className="mx-auto w-full max-w-7xl">
+        <header className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-gradient-to-br from-white/[0.075] to-white/[0.025] p-6 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-8">
+          <div className="absolute end-0 top-0 h-36 w-36 translate-x-1/3 -translate-y-1/3 rounded-full bg-violet-500/20 blur-3xl" />
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-violet-300/15 bg-violet-400/[0.08] px-3.5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-violet-200">
+                <span className="h-2 w-2 rounded-full bg-violet-400 shadow-[0_0_14px_rgba(167,139,250,.9)]" />
+                Administration
+              </span>
 
-        <p className="mt-4 max-w-2xl leading-7 text-slate-400">
-          Add, edit and manage
-          literary reflections
-          and optional images shown
-          on the public website.
-        </p>
+              <h1 className="mt-5 bg-gradient-to-r from-white via-violet-100 to-blue-200 bg-clip-text text-3xl font-black tracking-[-0.035em] text-transparent sm:text-4xl lg:text-5xl">
+                Literary Reflections
+              </h1>
+
+              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">
+                Create, edit and organize literary reflections and their optional artwork for the public website.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-slate-950/40 px-4 py-3">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-violet-500/15 text-lg text-violet-300">✦</span>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Published</p>
+                <p className="mt-0.5 text-xl font-bold text-white">{reflections.length}</p>
+              </div>
+            </div>
+          </div>
+        </header>
 
         <form
           onSubmit={
             handleSubmit
           }
-          className="mt-10 rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-2xl"
+          className="mt-8 rounded-[28px] border border-white/[0.08] bg-[#0b1020]/80 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-7 lg:p-8"
         >
+          <div className="mb-7 flex items-center justify-between gap-4 border-b border-white/[0.07] pb-5">
+            <div>
+              <h2 className="text-xl font-bold text-white">{editingId ? "Edit reflection" : "New reflection"}</h2>
+              <p className="mt-1 text-sm text-slate-500">Fields marked as optional may be left empty.</p>
+            </div>
+            <span className="hidden rounded-xl border border-violet-400/15 bg-violet-500/[0.08] px-3 py-2 text-xs font-semibold text-violet-200 sm:block">Draft editor</span>
+          </div>
           <div className="grid gap-5 md:grid-cols-2">
             <div>
               <label
@@ -543,7 +569,7 @@ function AdminLiteraryReflections() {
                 }
                 maxLength={200}
                 placeholder="Example: The Value of Time"
-                className="mt-3 w-full rounded-xl border border-slate-700 bg-slate-950 p-4 text-slate-100 outline-none focus:border-violet-500"
+                className="mt-3 w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3.5 text-slate-100 outline-none transition placeholder:text-slate-600 hover:border-white/20 focus:border-violet-400/60 focus:ring-4 focus:ring-violet-500/10"
               />
             </div>
 
@@ -569,7 +595,7 @@ function AdminLiteraryReflections() {
                 }
                 maxLength={200}
                 placeholder="Example: Imam Al-Shafi'i"
-                className="mt-3 w-full rounded-xl border border-slate-700 bg-slate-950 p-4 text-slate-100 outline-none focus:border-violet-500"
+                className="mt-3 w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3.5 text-slate-100 outline-none transition placeholder:text-slate-600 hover:border-white/20 focus:border-violet-400/60 focus:ring-4 focus:ring-violet-500/10"
               />
             </div>
           </div>
@@ -597,7 +623,7 @@ function AdminLiteraryReflections() {
               rows={10}
               placeholder={`Enter the reflection here...
 Each line can be written on a new line.`}
-              className="mt-3 w-full resize-y rounded-xl border border-slate-700 bg-slate-950 p-4 text-lg leading-8 text-slate-100 outline-none placeholder:text-slate-600 focus:border-violet-500"
+              className="mt-3 w-full resize-y rounded-2xl border border-white/10 bg-slate-950/70 p-4 text-lg leading-8 text-slate-100 outline-none transition placeholder:text-slate-600 hover:border-white/20 focus:border-violet-400/60 focus:ring-4 focus:ring-violet-500/10"
             />
 
             <div className="mt-2 text-end text-sm text-slate-500">
@@ -605,7 +631,7 @@ Each line can be written on a new line.`}
             </div>
           </div>
 
-          <div className="mt-6 rounded-2xl border border-slate-700 bg-slate-950/70 p-5">
+          <div className="mt-6 rounded-3xl border border-white/[0.08] bg-slate-950/50 p-5 sm:p-6">
             <div className="flex flex-col gap-5 md:flex-row md:items-start">
               <div className="flex-1">
                 <label
@@ -624,7 +650,7 @@ Each line can be written on a new line.`}
                 <div className="mt-4 flex flex-wrap gap-3">
                   <label
                     htmlFor="reflection-image"
-                    className="cursor-pointer rounded-xl bg-violet-600 px-5 py-2.5 font-semibold text-white transition hover:bg-violet-500"
+                    className="cursor-pointer rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-2.5 font-semibold text-white shadow-lg shadow-violet-950/30 transition hover:-translate-y-0.5 hover:from-violet-500 hover:to-indigo-500"
                   >
                     Choose Image
                   </label>
@@ -707,7 +733,7 @@ Each line can be written on a new line.`}
             <button
               type="submit"
               disabled={saving}
-              className="cursor-pointer rounded-xl bg-violet-600 px-6 py-3 font-semibold text-white transition hover:bg-violet-500 disabled:opacity-60"
+              className="cursor-pointer rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-3 font-semibold text-white shadow-lg shadow-violet-950/30 transition hover:-translate-y-0.5 hover:from-violet-500 hover:to-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {saving
                 ? "Saving..."
@@ -730,10 +756,10 @@ Each line can be written on a new line.`}
           </div>
         </form>
 
-        <div className="mt-12">
+        <div className="mt-12 rounded-[28px] border border-white/[0.07] bg-white/[0.025] p-5 backdrop-blur-sm sm:p-7">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-2xl font-semibold text-white">
-              Saved Reflection
+              Saved Reflections
             </h2>
 
             <span className="rounded-full bg-slate-800 px-3 py-1 text-sm text-slate-300">
@@ -759,7 +785,7 @@ Each line can be written on a new line.`}
                     key={
                       item.id
                     }
-                    className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6"
+                    className="group rounded-3xl border border-white/[0.08] bg-[#0b1020]/75 p-5 shadow-lg shadow-black/10 transition duration-300 hover:-translate-y-0.5 hover:border-violet-400/20 hover:shadow-2xl hover:shadow-violet-950/10 sm:p-6"
                   >
                     <div className="flex flex-col gap-6 lg:flex-row">
                       {item.imageUrl && (
@@ -821,7 +847,7 @@ Each line can be written on a new line.`}
                                 item
                               )
                             }
-                            className="cursor-pointer rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
+                            className="cursor-pointer rounded-xl border border-blue-400/20 bg-blue-500/10 px-4 py-2 font-semibold text-blue-200 transition hover:bg-blue-500/20 hover:text-white"
                           >
                             Edit
                           </button>
@@ -833,7 +859,7 @@ Each line can be written on a new line.`}
                                 item
                               )
                             }
-                            className="cursor-pointer rounded-xl bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-500"
+                            className="cursor-pointer rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-2 font-semibold text-red-200 transition hover:bg-red-500/20 hover:text-white"
                           >
                             Delete
                           </button>
