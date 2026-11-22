@@ -1,3 +1,19 @@
+
+# Local environment secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+**/.dev.vars
+
+# Cloudflare local files
+**/.wrangler/
+
+# Local database and source backups
+*.dump
+*.backup
+worker/src/*.before-*
+worker/wrangler.jsonc.before-*
 # ============================================
 # Dependencies
 node_modules/

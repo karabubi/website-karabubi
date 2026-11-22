@@ -1,0 +1,21 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "website-karabubi-api",
+	"main": "src/index.js",
+	"compatibility_date": "2026-10-16",
+	"observability": {
+		"enabled": true
+	},
+	"hyperdrive": [
+		{
+			"binding": "HYPERDRIVE",
+			"id": "f24bf4c3b9524057ab5e5425e0101f89"
+		}
+	],
+	"r2_buckets": [
+		{
+			"bucket_name": "website-karabubi-media",
+			"binding": "MEDIA"
+		}
+	]
+}
