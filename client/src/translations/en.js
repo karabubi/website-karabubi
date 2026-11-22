@@ -12,6 +12,8 @@ const en = {
     manageWisdom: "Manage Wisdom",
     poetry: "Poetry",
     managePoetry: "Manage Poetry",
+    reflections: "Literary Reflections",
+    manageReflections: "Manage Reflections",
     videos: "Videos",
     gallery: "Gallery",
     manageVideos: "Manage Videos",
@@ -217,6 +219,21 @@ const en = {
     emptyTitle: "Poetry is coming soon",
     emptyText: "New verses of wisdom will appear here when they are published.",
     footer: "Words · Reflection · Wisdom",
+  },
+
+  reflections: {
+    eyebrow: "Literature · Reflection",
+    title: "Literary Reflections",
+    description: "Short literary texts that express feelings, thoughts and reflections on life.",
+    loading: "Discovering a reflection...",
+    loadErrorTitle: "The reflection could not be loaded",
+    loadError: "Unable to load literary reflections.",
+    tryAgain: "Try again",
+    showAnother: "Discover another reflection",
+    randomHint: "A new reflection is selected each time.",
+    emptyTitle: "Literary reflections are coming soon",
+    emptyText: "New literary reflections will appear here when they are published.",
+    footer: "Words · Feelings · Reflection",
   },
 
   adminWisdom: {

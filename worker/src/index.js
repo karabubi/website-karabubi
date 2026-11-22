@@ -1930,6 +1930,878 @@ app.get("/api/wisdom-poetry/random", async (c) => {
   }
 });
 
+// =====================================================
+// Literary Reflections admin CRUD
+// =====================================================
+
+const REFLECTION_MAX_TITLE_LENGTH = 200;
+const REFLECTION_MAX_AUTHOR_LENGTH = 200;
+const REFLECTION_MAX_REFLECTION_LENGTH = 5000;
+const REFLECTION_MAX_IMAGE_SIZE =
+  10 * 1024 * 1024;
+
+const REFLECTION_IMAGE_TYPES = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp"
+};
+
+const normalizeReflectionText = (value) =>
+  String(value || "").trim();
+
+const normalizeReflectionBoolean = (value) =>
+  String(value || "")
+    .toLowerCase() === "true";
+
+const validateReflection = ({
+  title,
+  author,
+  reflection
+}) => {
+  if (!reflection) {
+    return "Reflection text is required.";
+  }
+
+  if (
+    reflection.length >
+    REFLECTION_MAX_REFLECTION_LENGTH
+  ) {
+    return (
+      "Reflection must not exceed " +
+      `${REFLECTION_MAX_REFLECTION_LENGTH} characters.`
+    );
+  }
+
+  if (
+    title.length >
+    REFLECTION_MAX_TITLE_LENGTH
+  ) {
+    return (
+      "Title must not exceed " +
+      `${REFLECTION_MAX_TITLE_LENGTH} characters.`
+    );
+  }
+
+  if (
+    author.length >
+    REFLECTION_MAX_AUTHOR_LENGTH
+  ) {
+    return (
+      "Author must not exceed " +
+      `${REFLECTION_MAX_AUTHOR_LENGTH} characters.`
+    );
+  }
+
+  return null;
+};
+
+const reflectionImageUrl = (filename) =>
+  filename
+    ? `/literary-reflections/images/${encodeURIComponent(
+        filename
+      )}`
+    : null;
+
+const reflectionResponse = (row) => ({
+  ...row,
+  imageUrl:
+    reflectionImageUrl(
+      row.imageFilename
+    )
+});
+
+const createReflectionImageFilename =
+  (file) => {
+    const extension =
+      REFLECTION_IMAGE_TYPES[file.type];
+
+    return (
+      Date.now() +
+      "-" +
+      crypto.randomUUID() +
+      extension
+    );
+  };
+
+const validateReflectionImage =
+  (file) => {
+    if (!file) {
+      return null;
+    }
+
+    if (
+      !REFLECTION_IMAGE_TYPES[
+        file.type
+      ]
+    ) {
+      return (
+        "Only JPG, PNG and WEBP images are allowed."
+      );
+    }
+
+    if (
+      file.size >
+      REFLECTION_MAX_IMAGE_SIZE
+    ) {
+      return (
+        "Image must be 10 MB or smaller."
+      );
+    }
+
+    return null;
+  };
+
+const deleteReflectionR2Image =
+  async (c, filename) => {
+    if (!filename) {
+      return;
+    }
+
+    const key =
+      `literary-reflections/${filename}`;
+
+    await c.env.MEDIA.delete(key);
+
+    let remaining =
+      await c.env.MEDIA.head(key);
+
+    if (remaining) {
+      console.warn(
+        "Reflection image still existed after first delete; retrying:",
+        key
+      );
+
+      await c.env.MEDIA.delete(key);
+
+      remaining =
+        await c.env.MEDIA.head(key);
+
+      if (remaining) {
+        throw new Error(
+          "Unable to remove literary reflections image from R2."
+        );
+      }
+    }
+  };
+
+app.get(
+  "/api/literary-reflections/",
+  async (c) => {
+    const admin =
+      await authorizeAdminRequest(c);
+
+    if (!admin.ok) {
+      return admin.response;
+    }
+
+    try {
+      return await withDb(
+        c,
+        async (client) => {
+          const result =
+            await client.query(`
+              SELECT
+                id,
+                title,
+                author,
+                reflection,
+                "imageFilename",
+                "createdAt",
+                "updatedAt"
+              FROM literary_reflections
+              ORDER BY
+                "createdAt" DESC,
+                id DESC
+            `);
+
+          return c.json({
+            success: true,
+            reflections:
+              result.rows.map(
+                reflectionResponse
+              )
+          });
+        }
+      );
+    } catch (error) {
+      console.error(
+        "Literary reflection list error:",
+        error
+      );
+
+      return c.json(
+        {
+          success: false,
+          error:
+            "Unable to load literary reflections."
+        },
+        500
+      );
+    }
+  }
+);
+
+app.post(
+  "/api/literary-reflections/",
+  async (c) => {
+    const admin =
+      await authorizeAdminRequest(c);
+
+    if (!admin.ok) {
+      return admin.response;
+    }
+
+    let uploadedFilename = null;
+
+    try {
+      const form =
+        await c.req.formData();
+
+      const title =
+        normalizeReflectionText(
+          form.get("title")
+        );
+
+      const author =
+        normalizeReflectionText(
+          form.get("author")
+        );
+
+      const reflection =
+        normalizeReflectionText(
+          form.get("reflection")
+        );
+
+      const validationError =
+        validateReflection({
+          title,
+          author,
+          reflection
+        });
+
+      const imageValue =
+        form.get("image");
+
+      const image =
+        imageValue instanceof File &&
+        imageValue.size > 0
+          ? imageValue
+          : null;
+
+      const imageError =
+        validateReflectionImage(image);
+
+      if (imageError) {
+        return c.json(
+          {
+            success: false,
+            error: imageError
+          },
+          400
+        );
+      }
+
+      if (image) {
+        uploadedFilename =
+          createReflectionImageFilename(
+            image
+          );
+
+        await c.env.MEDIA.put(
+          `literary-reflections/${uploadedFilename}`,
+          image.stream(),
+          {
+            httpMetadata: {
+              contentType:
+                image.type
+            }
+          }
+        );
+      }
+
+      if (validationError) {
+        if (uploadedFilename) {
+          await deleteReflectionR2Image(
+            c,
+            uploadedFilename
+          );
+        }
+
+        return c.json(
+          {
+            success: false,
+            error: validationError
+          },
+          400
+        );
+      }
+
+      return await withDb(
+        c,
+        async (client) => {
+          try {
+            const result =
+              await client.query(
+                `
+                  INSERT INTO literary_reflections
+                  (
+                    title,
+                    author,
+                    reflection,
+                    "imageFilename",
+                    "createdAt",
+                    "updatedAt"
+                  )
+                  VALUES
+                  (
+                    $1,
+                    $2,
+                    $3,
+                    $4,
+                    NOW(),
+                    NOW()
+                  )
+                  RETURNING
+                    id,
+                    title,
+                    author,
+                    reflection,
+                    "imageFilename",
+                    "createdAt",
+                    "updatedAt"
+                `,
+                [
+                  title || null,
+                  author || null,
+                  reflection,
+                  uploadedFilename
+                ]
+              );
+
+            return c.json(
+              {
+                success: true,
+                message:
+                  "Literary reflection created successfully.",
+                reflection:
+                  reflectionResponse(
+                    result.rows[0]
+                  )
+              },
+              201
+            );
+          } catch (error) {
+            if (uploadedFilename) {
+              await deleteReflectionR2Image(
+                c,
+                uploadedFilename
+              ).catch(() => {});
+            }
+
+            throw error;
+          }
+        }
+      );
+    } catch (error) {
+      if (uploadedFilename) {
+        await deleteReflectionR2Image(
+          c,
+          uploadedFilename
+        ).catch(() => {});
+      }
+
+      console.error(
+        "Create literary reflection error:",
+        error
+      );
+
+      return c.json(
+        {
+          success: false,
+          error:
+            "Unable to create literary reflection."
+        },
+        500
+      );
+    }
+  }
+);
+
+app.patch(
+  "/api/literary-reflections/:id",
+  async (c) => {
+    const admin =
+      await authorizeAdminRequest(c);
+
+    if (!admin.ok) {
+      return admin.response;
+    }
+
+    const id =
+      Number(
+        c.req.param("id")
+      );
+
+    if (
+      !Number.isInteger(id) ||
+      id <= 0
+    ) {
+      return c.json(
+        {
+          success: false,
+          error:
+            "Invalid literary reflection ID."
+        },
+        400
+      );
+    }
+
+    let uploadedFilename = null;
+
+    try {
+      const form =
+        await c.req.formData();
+
+      const title =
+        normalizeReflectionText(
+          form.get("title")
+        );
+
+      const author =
+        normalizeReflectionText(
+          form.get("author")
+        );
+
+      const reflection =
+        normalizeReflectionText(
+          form.get("reflection")
+        );
+
+      const removeImage =
+        normalizeReflectionBoolean(
+          form.get("removeImage")
+        );
+
+      const validationError =
+        validateReflection({
+          title,
+          author,
+          reflection
+        });
+
+      if (validationError) {
+        return c.json(
+          {
+            success: false,
+            error:
+              validationError
+          },
+          400
+        );
+      }
+
+      const imageValue =
+        form.get("image");
+
+      const image =
+        imageValue instanceof File &&
+        imageValue.size > 0
+          ? imageValue
+          : null;
+
+      const imageError =
+        validateReflectionImage(image);
+
+      if (imageError) {
+        return c.json(
+          {
+            success: false,
+            error: imageError
+          },
+          400
+        );
+      }
+
+      return await withDb(
+        c,
+        async (client) => {
+          const existingResult =
+            await client.query(
+              `
+                SELECT
+                  id,
+                  title,
+                  author,
+                  reflection,
+                  "imageFilename",
+                  "createdAt",
+                  "updatedAt"
+                FROM literary_reflections
+                WHERE id = $1
+                LIMIT 1
+              `,
+              [id]
+            );
+
+          if (
+            existingResult.rowCount ===
+            0
+          ) {
+            return c.json(
+              {
+                success: false,
+                error:
+                  "Literary reflection not found."
+              },
+              404
+            );
+          }
+
+          const existing =
+            existingResult.rows[0];
+
+          const oldImage =
+            existing.imageFilename;
+
+          let nextImage =
+            oldImage;
+
+          if (image) {
+            uploadedFilename =
+              createReflectionImageFilename(
+                image
+              );
+
+            await c.env.MEDIA.put(
+              `literary-reflections/${uploadedFilename}`,
+              image.stream(),
+              {
+                httpMetadata: {
+                  contentType:
+                    image.type
+                }
+              }
+            );
+
+            nextImage =
+              uploadedFilename;
+          } else if (removeImage) {
+            nextImage = null;
+          }
+
+          try {
+            const result =
+              await client.query(
+                `
+                  UPDATE literary_reflections
+                  SET
+                    title = $1,
+                    author = $2,
+                    reflection = $3,
+                    "imageFilename" = $4,
+                    "updatedAt" = NOW()
+                  WHERE id = $5
+                  RETURNING
+                    id,
+                    title,
+                    author,
+                    reflection,
+                    "imageFilename",
+                    "createdAt",
+                    "updatedAt"
+                `,
+                [
+                  title || null,
+                  author || null,
+                  reflection,
+                  nextImage,
+                  id
+                ]
+              );
+
+            if (
+              oldImage &&
+              oldImage !== nextImage
+            ) {
+              await deleteReflectionR2Image(
+                c,
+                oldImage
+              );
+            }
+
+            return c.json({
+              success: true,
+              message:
+                "Literary reflection updated successfully.",
+              reflection:
+                reflectionResponse(
+                  result.rows[0]
+                )
+            });
+          } catch (error) {
+            if (uploadedFilename) {
+              await deleteReflectionR2Image(
+                c,
+                uploadedFilename
+              ).catch(() => {});
+            }
+
+            throw error;
+          }
+        }
+      );
+    } catch (error) {
+      console.error(
+        "Update literary reflection error:",
+        error
+      );
+
+      return c.json(
+        {
+          success: false,
+          error:
+            "Unable to update literary reflection."
+        },
+        500
+      );
+    }
+  }
+);
+
+app.delete(
+  "/api/literary-reflections/:id",
+  async (c) => {
+    const admin =
+      await authorizeAdminRequest(c);
+
+    if (!admin.ok) {
+      return admin.response;
+    }
+
+    const id =
+      Number(
+        c.req.param("id")
+      );
+
+    if (
+      !Number.isInteger(id) ||
+      id <= 0
+    ) {
+      return c.json(
+        {
+          success: false,
+          error:
+            "Invalid literary reflection ID."
+        },
+        400
+      );
+    }
+
+    try {
+      return await withDb(
+        c,
+        async (client) => {
+          const existingResult =
+            await client.query(
+              `
+                SELECT
+                  id,
+                  "imageFilename"
+                FROM literary_reflections
+                WHERE id = $1
+                LIMIT 1
+              `,
+              [id]
+            );
+
+          if (
+            existingResult.rowCount ===
+            0
+          ) {
+            return c.json(
+              {
+                success: false,
+                error:
+                  "Literary reflection not found."
+              },
+              404
+            );
+          }
+
+          const imageFilename =
+            existingResult.rows[0]
+              .imageFilename;
+
+          await client.query(
+            `
+              DELETE FROM literary_reflections
+              WHERE id = $1
+            `,
+            [id]
+          );
+
+          if (imageFilename) {
+            await deleteReflectionR2Image(
+              c,
+              imageFilename
+            );
+          }
+
+          return c.json({
+            success: true,
+            message:
+              "Literary reflection deleted successfully."
+          });
+        }
+      );
+    } catch (error) {
+      console.error(
+        "Delete literary reflection error:",
+        error
+      );
+
+      return c.json(
+        {
+          success: false,
+          error:
+            "Unable to delete literary reflection."
+        },
+        500
+      );
+    }
+  }
+);
+
+
+app.get("/api/literary-reflections/images/:filename", async (c) => {
+  const filename = c.req.param("filename");
+
+  if (
+    !filename ||
+    filename.includes("..") ||
+    filename.includes("/") ||
+    filename.includes("\\")
+  ) {
+    return c.json(
+      {
+        success: false,
+        error: "Invalid reflection image filename."
+      },
+      400
+    );
+  }
+
+  try {
+    const object = await c.env.MEDIA.get(
+      `literary-reflections/${filename}`
+    );
+
+    if (!object) {
+      return c.json(
+        {
+          success: false,
+          error: "Reflection image not found."
+        },
+        404
+      );
+    }
+
+    const headers = new Headers();
+
+    object.writeHttpMetadata(headers);
+
+    if (!headers.has("Content-Type")) {
+      headers.set(
+        "Content-Type",
+        "application/octet-stream"
+      );
+    }
+
+    headers.set(
+      "Cache-Control",
+      "public, max-age=31536000, immutable"
+    );
+
+    if (object.httpEtag) {
+      headers.set("ETag", object.httpEtag);
+    }
+
+    return new Response(object.body, {
+      headers
+    });
+  } catch (error) {
+    console.error(
+      "Literary reflection image error:",
+      error
+    );
+
+    return c.json(
+      {
+        success: false,
+        error: "Unable to load reflection image."
+      },
+      500
+    );
+  }
+});
+
+app.get("/api/literary-reflections/random", async (c) => {
+  try {
+    return await withDb(c, async (client) => {
+
+
+      const result = await client.query(`
+        SELECT
+          id,
+          title,
+          author,
+          reflection,
+          "imageFilename"
+        FROM literary_reflections
+        ORDER BY RANDOM()
+        LIMIT 1
+      `);
+
+      if (result.rowCount === 0) {
+        return c.json(
+          {
+            success: false,
+            error: "No literary reflections are available yet."
+          },
+          404
+        );
+      }
+
+      const reflection = result.rows[0];
+
+      return c.json({
+        success: true,
+        reflection: {
+          ...reflection,
+          imageUrl: reflection.imageFilename
+            ? `/literary-reflections/images/${encodeURIComponent(
+                reflection.imageFilename
+              )}`
+            : null
+        }
+      });
+    });
+  } catch (error) {
+    console.error(
+      "Random literary reflection error:",
+      error
+    );
+
+    return c.json(
+      {
+        success: false,
+        error: "Unable to load a literary reflection."
+      },
+      500
+    );
+  }
+});
+
 app.get("/api/gallery", async (c) => {
   try {
     return await withDb(c, async (client) => {

@@ -1,3 +1,5 @@
+import LiteraryReflections from "./components/LiteraryReflections";
+import AdminLiteraryReflections from "./components/AdminLiteraryReflections";
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -40,6 +42,14 @@ function App() {
           <Route path="/admin/wisdom" element={<AdminWisdom />} />
           <Route path="/wisdom-poetry" element={<WisdomPoetry />} />
           <Route path="/admin/wisdom-poetry" element={<AdminWisdomPoetry />} />
+          <Route
+            path="/literary-reflections"
+            element={<LiteraryReflections />}
+          />
+          <Route
+            path="/admin/literary-reflections"
+            element={<AdminLiteraryReflections />}
+          />
           <Route path="/videos" element={<Videos />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/admin/gallery" element={<AdminGallery />} />

@@ -12,6 +12,8 @@ const ar = {
     manageWisdom: "إدارة الحِكم",
     poetry: "الشعر",
     managePoetry: "إدارة الشعر",
+    reflections: "خواطر أدبية",
+    manageReflections: "إدارة الخواطر",
     videos: "الفيديوهات",
     gallery: "معرض الصور",
     manageVideos: "إدارة الفيديوهات",
@@ -217,6 +219,21 @@ const ar = {
     emptyTitle: "الشعر قادم قريبًا",
     emptyText: "ستظهر هنا أبيات جديدة من الحكمة عند نشرها.",
     footer: "كلمات · تأمل · حكمة",
+  },
+
+  reflections: {
+    eyebrow: "أدب · تأمل",
+    title: "خواطر أدبية",
+    description: "نصوص أدبية قصيرة تعبّر عن المشاعر والأفكار والتأملات في الحياة.",
+    loading: "جارٍ تحميل خاطرة...",
+    loadErrorTitle: "تعذر تحميل الخاطرة",
+    loadError: "تعذر تحميل الخواطر الأدبية.",
+    tryAgain: "حاول مرة أخرى",
+    showAnother: "اكتشف خاطرة أخرى",
+    randomHint: "يتم اختيار خاطرة جديدة في كل مرة.",
+    emptyTitle: "الخواطر الأدبية قادمة قريبًا",
+    emptyText: "ستظهر هنا خواطر أدبية جديدة عند نشرها.",
+    footer: "كلمات · مشاعر · تأمل",
   },
 
   adminWisdom: {

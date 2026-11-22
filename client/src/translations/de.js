@@ -12,6 +12,8 @@ const de = {
     manageWisdom: "Weisheiten verwalten",
     poetry: "Poesie",
     managePoetry: "Poesie verwalten",
+    reflections: "Literarische Gedanken",
+    manageReflections: "Gedanken verwalten",
     videos: "Videos",
     gallery: "Galerie",
     manageVideos: "Videos verwalten",
@@ -217,6 +219,21 @@ const de = {
     emptyTitle: "Poesie erscheint bald",
     emptyText: "Neue Verse der Weisheit erscheinen hier, sobald sie veröffentlicht werden.",
     footer: "Worte · Reflexion · Weisheit",
+  },
+
+  reflections: {
+    eyebrow: "Literatur · Gedanken",
+    title: "Literarische Gedanken",
+    description: "Kurze literarische Texte, die Gefühle, Gedanken und Betrachtungen über das Leben ausdrücken.",
+    loading: "Ein literarischer Gedanke wird geladen...",
+    loadErrorTitle: "Der literarische Gedanke konnte nicht geladen werden",
+    loadError: "Die literarischen Gedanken konnten nicht geladen werden.",
+    tryAgain: "Erneut versuchen",
+    showAnother: "Einen weiteren Gedanken entdecken",
+    randomHint: "Bei jeder Auswahl wird ein neuer Gedanke zufällig angezeigt.",
+    emptyTitle: "Literarische Gedanken erscheinen bald",
+    emptyText: "Neue literarische Gedanken erscheinen hier, sobald sie veröffentlicht werden.",
+    footer: "Worte · Gefühle · Gedanken",
   },
 
   adminWisdom: {
