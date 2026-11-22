@@ -1,9 +1,19 @@
+
 import React, { useRef } from "react";
 
 const screenshots = [
-  { title: "Dashboard", image: "/xc-agent/dashboard.png" },
-  { title: "Transactions", image: "/xc-agent/transactions.png" },
-  { title: "Account Statements", image: "/xc-agent/account-statements.png" },
+  {
+    title: "Dashboard",
+    image: "/xc-agent/dashboard.png",
+  },
+  {
+    title: "Transactions",
+    image: "/xc-agent/transactions.png",
+  },
+  {
+    title: "Account Statements",
+    image: "/xc-agent/account-statements.png",
+  },
 ];
 
 export default function XcAgentGallery() {
@@ -21,18 +31,17 @@ export default function XcAgentGallery() {
 
       <dialog
         ref={dialogRef}
-        className="m-auto max-h-[90vh] w-[95%] max-w-5xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-950 p-6 text-white backdrop:bg-black/80"
         onClick={(event) => {
           if (event.target === dialogRef.current) {
             dialogRef.current.close();
           }
         }}
+        className="m-auto max-h-[90vh] w-[95%] max-w-5xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-950 p-6 text-white backdrop:bg-black/80"
       >
         <div className="mb-6 flex items-center justify-between gap-4">
           <h2 className="text-2xl font-bold">
             XC Agent Portal Gallery
           </h2>
-
           <button
             type="button"
             onClick={() => dialogRef.current?.close()}
@@ -50,7 +59,6 @@ export default function XcAgentGallery() {
                 alt={`XC Agent Portal ${item.title}`}
                 className="w-full rounded-xl border border-slate-700"
               />
-
               <figcaption className="mt-3 text-center text-slate-300">
                 {item.title}
               </figcaption>
