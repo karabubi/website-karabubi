@@ -1,6 +1,8 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
+  useRef,
   useState,
 } from "react";
 import { Navigate } from "react-router-dom";
@@ -167,6 +169,32 @@ function AdminLiteraryReflections() {
 
   const [message, setMessage] =
     useState("");
+
+  const reflectionTextareaRef =
+    useRef(null);
+
+  const uploadedImages = useMemo(
+    () =>
+      reflections.filter(
+        (item) => item.imageUrl
+      ),
+    [reflections]
+  );
+
+  useEffect(() => {
+    const textarea =
+      reflectionTextareaRef.current;
+
+    if (!textarea) {
+      return;
+    }
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.max(
+      360,
+      textarea.scrollHeight
+    )}px`;
+  }, [reflection]);
 
   useEffect(() => {
     return () => {
@@ -519,7 +547,7 @@ function AdminLiteraryReflections() {
               </h1>
 
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">
-                Create, edit and organize literary reflections and their optional artwork for the public website.
+                Write without losing context. Your complete reflection and artwork stay visible while you compose.
               </p>
             </div>
 
@@ -539,13 +567,15 @@ function AdminLiteraryReflections() {
           }
           className="mt-8 rounded-[28px] border border-white/[0.08] bg-[#0b1020]/80 p-5 shadow-2xl shadow-black/25 backdrop-blur-xl sm:p-7 lg:p-8"
         >
-          <div className="mb-7 flex items-center justify-between gap-4 border-b border-white/[0.07] pb-5">
+          <div className="mb-7 flex flex-col gap-4 border-b border-white/[0.07] pb-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xl font-bold text-white">{editingId ? "Edit reflection" : "New reflection"}</h2>
-              <p className="mt-1 text-sm text-slate-500">Fields marked as optional may be left empty.</p>
+              <p className="mt-1 text-sm text-slate-500">Write on the left and review the finished presentation on the right.</p>
             </div>
-            <span className="hidden rounded-xl border border-violet-400/15 bg-violet-500/[0.08] px-3 py-2 text-xs font-semibold text-violet-200 sm:block">Draft editor</span>
+            <span className="w-fit rounded-xl border border-violet-400/15 bg-violet-500/[0.08] px-3 py-2 text-xs font-semibold text-violet-200">Live writing studio</span>
           </div>
+          <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]">
+            <div className="min-w-0">
           <div className="grid gap-5 md:grid-cols-2">
             <div>
               <label
@@ -609,6 +639,7 @@ function AdminLiteraryReflections() {
             </label>
 
             <textarea
+              ref={reflectionTextareaRef}
               id="reflection-text"
               value={reflection}
               onChange={(
@@ -620,10 +651,10 @@ function AdminLiteraryReflections() {
                 )
               }
               maxLength={5000}
-              rows={10}
+              rows={14}
               placeholder={`Enter the reflection here...
 Each line can be written on a new line.`}
-              className="mt-3 w-full resize-y rounded-2xl border border-white/10 bg-slate-950/70 p-4 text-lg leading-8 text-slate-100 outline-none transition placeholder:text-slate-600 hover:border-white/20 focus:border-violet-400/60 focus:ring-4 focus:ring-violet-500/10"
+              className="mt-3 min-h-[360px] w-full resize-none overflow-hidden rounded-2xl border border-white/10 bg-slate-950/70 p-5 text-lg leading-8 text-slate-100 outline-none transition placeholder:text-slate-600 hover:border-white/20 focus:border-violet-400/60 focus:ring-4 focus:ring-violet-500/10"
             />
 
             <div className="mt-2 text-end text-sm text-slate-500">
@@ -650,7 +681,7 @@ Each line can be written on a new line.`}
                 <div className="mt-4 flex flex-wrap gap-3">
                   <label
                     htmlFor="reflection-image"
-                    className="cursor-pointer rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-2.5 font-semibold text-white shadow-lg shadow-violet-950/30 transition hover:-translate-y-0.5 hover:from-violet-500 hover:to-indigo-500"
+                    className="cursor-pointer rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-2.5 font-semibold text-white shadow-lg shadow-violet-950/30 transition hover:-translate-y-0.5 hover:from-violet-500 hover:to-indigo-500 focus-within:ring-4 focus-within:ring-violet-500/20"
                   >
                     Choose Image
                   </label>
@@ -708,13 +739,68 @@ Each line can be written on a new line.`}
                     />
                   </div>
                 ) : (
-                  <div className="flex h-56 items-center justify-center rounded-2xl border border-dashed border-slate-700 bg-slate-900/60 px-5 text-center text-sm text-slate-500">
-                    Image preview
-                    will appear here.
-                  </div>
+                  <label htmlFor="reflection-image" className="flex h-56 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700 bg-slate-900/60 px-5 text-center transition hover:border-violet-400/40 hover:bg-violet-500/[0.04]">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-violet-500/10 text-2xl text-violet-300">+</span>
+                    <span className="mt-3 text-sm font-semibold text-slate-300">Add artwork</span>
+                    <span className="mt-1 text-xs text-slate-500">Preview appears here</span>
+                  </label>
                 )}
               </div>
             </div>
+          </div>
+
+            </div>
+
+            <aside className="xl:sticky xl:top-6">
+              <div className="overflow-hidden rounded-[26px] border border-white/[0.1] bg-gradient-to-b from-[#12182b] to-[#080c18] shadow-2xl shadow-black/30">
+                <div className="flex items-center justify-between border-b border-white/[0.08] px-5 py-4">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,.75)]" />
+                    <span className="text-sm font-semibold text-slate-200">Live preview</span>
+                  </div>
+                  <span className="text-xs text-slate-500">Public view</span>
+                </div>
+
+                {activeImagePreview ? (
+                  <div className="border-b border-white/[0.08] bg-black/20 p-3">
+                    <img
+                      src={activeImagePreview}
+                      alt="Current reflection artwork"
+                      className="max-h-80 w-full rounded-2xl object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="grid h-36 place-items-center border-b border-dashed border-white/[0.08] bg-violet-500/[0.025] px-6 text-center">
+                    <p className="text-sm text-slate-500">Your optional artwork will be shown here.</p>
+                  </div>
+                )}
+
+                <div className="p-6 sm:p-7">
+                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-violet-300">Literary reflection</p>
+                  <h3 dir="auto" className="mt-4 break-words text-2xl font-bold leading-tight text-white">
+                    {title.trim() || "Your title will appear here"}
+                  </h3>
+                  <p dir="auto" className="mt-2 text-sm font-medium text-violet-300">
+                    {author.trim() ? `— ${author.trim()}` : "Author is optional"}
+                  </p>
+                  <div className="my-5 h-px bg-gradient-to-r from-violet-400/40 via-white/10 to-transparent" />
+                  <p dir="auto" className={`whitespace-pre-wrap break-words text-lg leading-8 ${reflection.trim() ? "text-slate-200" : "text-slate-500"}`}>
+                    {reflection || "Start writing your reflection. Every line and paragraph will stay visible in this preview."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="rounded-2xl border border-white/[0.07] bg-white/[0.035] p-4">
+                  <p className="text-xs uppercase tracking-[0.15em] text-slate-500">Characters</p>
+                  <p className="mt-1 text-lg font-bold text-white">{reflection.length}<span className="text-sm font-normal text-slate-600"> / 5000</span></p>
+                </div>
+                <div className="rounded-2xl border border-white/[0.07] bg-white/[0.035] p-4">
+                  <p className="text-xs uppercase tracking-[0.15em] text-slate-500">Artwork</p>
+                  <p className="mt-1 text-lg font-bold text-white">{activeImagePreview ? "Ready" : "Optional"}</p>
+                </div>
+              </div>
+            </aside>
           </div>
 
           {error && (
@@ -755,6 +841,56 @@ Each line can be written on a new line.`}
             )}
           </div>
         </form>
+
+        <section className="mt-10 rounded-[28px] border border-white/[0.07] bg-white/[0.025] p-5 backdrop-blur-sm sm:p-7" aria-labelledby="reflection-media-title">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-300">Media library</p>
+              <h2 id="reflection-media-title" className="mt-2 text-2xl font-bold text-white">All uploaded artwork</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-500">Every image currently used by a saved reflection is visible here.</p>
+            </div>
+            <span className="w-fit rounded-full border border-white/[0.08] bg-slate-950/60 px-3 py-1.5 text-sm text-slate-300">
+              {uploadedImages.length} {uploadedImages.length === 1 ? "image" : "images"}
+            </span>
+          </div>
+
+          {loading ? (
+            <p className="mt-6 text-slate-400">Loading artwork...</p>
+          ) : uploadedImages.length === 0 ? (
+            <label htmlFor="reflection-image" className="mt-6 flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed border-white/[0.1] bg-slate-950/30 px-6 text-center transition hover:border-violet-400/30 hover:bg-violet-500/[0.03]">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-violet-500/10 text-2xl text-violet-300">+</span>
+              <span className="mt-3 font-semibold text-slate-200">No artwork uploaded yet</span>
+              <span className="mt-1 text-sm text-slate-500">Choose an image in the editor to start the collection.</span>
+            </label>
+          ) : (
+            <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {uploadedImages.map((item) => (
+                <button
+                  key={`media-${item.id}`}
+                  type="button"
+                  onClick={() => startEdit(item)}
+                  className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-slate-950/50 text-left transition hover:-translate-y-0.5 hover:border-violet-400/30 focus:outline-none focus:ring-4 focus:ring-violet-500/15"
+                  title="Open this reflection in the editor"
+                >
+                  <div className="aspect-square overflow-hidden bg-black/20">
+                    <img
+                      src={getReflectionImageUrl(item.imageUrl)}
+                      alt={item.title || item.author || "Literary reflection artwork"}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="p-3">
+                    <p dir="auto" className="truncate text-sm font-semibold text-slate-200">
+                      {item.title || "Untitled reflection"}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">Select to edit</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
 
         <div className="mt-12 rounded-[28px] border border-white/[0.07] bg-white/[0.025] p-5 backdrop-blur-sm sm:p-7">
           <div className="flex items-center justify-between gap-4">
