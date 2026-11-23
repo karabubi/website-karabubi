@@ -579,6 +579,17 @@ app.post(
           ? imageValue
           : null;
 
+      if (!reflection && !image) {
+        return c.json(
+          {
+            success: false,
+            error:
+              "Please provide reflection text or an image."
+          },
+          400
+        );
+      }
+
       const imageError =
         validateWisdomImage(image);
 
@@ -1619,6 +1630,17 @@ app.patch(
             nextImage = null;
           }
 
+          if (!reflection && !nextImage) {
+            return c.json(
+              {
+                success: false,
+                error:
+                  "Please provide reflection text or an image."
+              },
+              400
+            );
+          }
+
           try {
             const result =
               await client.query(
@@ -1958,10 +1980,6 @@ const validateReflection = ({
   author,
   reflection
 }) => {
-  if (!reflection) {
-    return "Reflection text is required.";
-  }
-
   if (
     reflection.length >
     REFLECTION_MAX_REFLECTION_LENGTH
