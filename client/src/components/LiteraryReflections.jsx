@@ -283,11 +283,7 @@ function LiteraryReflections() {
                         >
                           <img
                             src={`${API_URL}${reflection.imageUrl}`}
-                            alt={
-                              reflection.title ||
-                              reflection.author ||
-                              "Literary reflections"
-                            }
+                            alt="Literary reflection artwork"
                             className="mx-auto max-h-[460px] w-full rounded-[20px] object-contain transition-transform duration-200 hover:scale-[1.01]"
                           />
                         </button>
@@ -329,11 +325,7 @@ function LiteraryReflections() {
                             >
                               <img
                                 src={`${API_URL}${reflection.imageUrl}`}
-                                alt={
-                                  reflection.title ||
-                                  reflection.author ||
-                                  "Literary reflections"
-                                }
+                                alt="Literary reflection artwork"
                                 className="block shrink-0 rounded-[20px] object-contain shadow-[0_30px_90px_rgba(0,0,0,0.55)]"
                                 style={
                                   imageZoom === 100
@@ -445,18 +437,9 @@ function LiteraryReflections() {
                     </span>
                   </div>
 
-                  {reflection.title && (
-                    <h2
-                      dir="auto"
-                      className="mt-5 max-w-3xl text-balance font-serif text-3xl font-semibold tracking-[-0.025em] text-white sm:text-4xl lg:text-[2.65rem]"
-                    >
-                      {reflection.title}
-                    </h2>
-                  )}
-
                   <div
                     aria-hidden="true"
-                    className="my-6 flex items-center gap-3"
+                    className="mb-6 mt-4 flex items-center gap-3"
                   >
                     <span className="h-px w-12 bg-gradient-to-r from-transparent to-violet-400/50" />
 
@@ -471,21 +454,6 @@ function LiteraryReflections() {
                   >
                     {reflection.reflection}
                   </blockquote>
-
-                  {reflection.author && (
-                    <div className="mt-7">
-
-                      <div className="mx-auto mb-4 h-px w-8 bg-violet-400/40" />
-
-                      <p
-                        dir="auto"
-                        className="text-sm font-bold uppercase tracking-[0.18em] text-violet-300"
-                      >
-                        {reflection.author}
-                      </p>
-
-                    </div>
-                  )}
 
                   <button
                     type="button"

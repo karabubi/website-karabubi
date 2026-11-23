@@ -124,12 +124,6 @@ function AdminLiteraryReflections() {
   const [reflections, setReflections] =
     useState([]);
 
-  const [title, setTitle] =
-    useState("");
-
-  const [author, setAuthor] =
-    useState("");
-
   const [reflection, setReflection] =
     useState("");
 
@@ -278,8 +272,6 @@ function AdminLiteraryReflections() {
     );
 
   const resetForm = () => {
-    setTitle("");
-    setAuthor("");
     setReflection("");
 
     setImageFile(null);
@@ -375,16 +367,6 @@ function AdminLiteraryReflections() {
       new FormData();
 
     formData.append(
-      "title",
-      title.trim()
-    );
-
-    formData.append(
-      "author",
-      author.trim()
-    );
-
-    formData.append(
       "reflection",
       normalizedReflection
     );
@@ -448,14 +430,6 @@ function AdminLiteraryReflections() {
   ) => {
     setEditingId(
       item.id
-    );
-
-    setTitle(
-      item.title || ""
-    );
-
-    setAuthor(
-      item.author || ""
     );
 
     setReflection(
@@ -576,61 +550,7 @@ function AdminLiteraryReflections() {
           </div>
           <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]">
             <div className="min-w-0">
-          <div className="grid gap-5 md:grid-cols-2">
-            <div>
-              <label
-                htmlFor="reflection-title"
-                className="font-semibold text-slate-200"
-              >
-                Title
-              </label>
-
-              <input
-                id="reflection-title"
-                type="text"
-                value={title}
-                onChange={(
-                  event
-                ) =>
-                  setTitle(
-                    event.target
-                      .value
-                  )
-                }
-                maxLength={200}
-                placeholder="Example: The Value of Time"
-                className="mt-3 w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3.5 text-slate-100 outline-none transition placeholder:text-slate-600 hover:border-white/20 focus:border-violet-400/60 focus:ring-4 focus:ring-violet-500/10"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="reflection-author"
-                className="font-semibold text-slate-200"
-              >
-                Author
-              </label>
-
-              <input
-                id="reflection-author"
-                type="text"
-                value={author}
-                onChange={(
-                  event
-                ) =>
-                  setAuthor(
-                    event.target
-                      .value
-                  )
-                }
-                maxLength={200}
-                placeholder="Example: Imam Al-Shafi'i"
-                className="mt-3 w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3.5 text-slate-100 outline-none transition placeholder:text-slate-600 hover:border-white/20 focus:border-violet-400/60 focus:ring-4 focus:ring-violet-500/10"
-              />
-            </div>
-          </div>
-
-          <div className="mt-5">
+          <div>
             <label
               htmlFor="reflection-text"
               className="font-semibold text-slate-200"
@@ -777,13 +697,7 @@ Each line can be written on a new line.`}
 
                 <div className="p-6 sm:p-7">
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-violet-300">Literary reflection</p>
-                  <h3 dir="auto" className="mt-4 break-words text-2xl font-bold leading-tight text-white">
-                    {title.trim() || "Your title will appear here"}
-                  </h3>
-                  <p dir="auto" className="mt-2 text-sm font-medium text-violet-300">
-                    {author.trim() ? `— ${author.trim()}` : "Author is optional"}
-                  </p>
-                  <div className="my-5 h-px bg-gradient-to-r from-violet-400/40 via-white/10 to-transparent" />
+                  <div className="mb-5 mt-4 h-px bg-gradient-to-r from-violet-400/40 via-white/10 to-transparent" />
                   <p dir="auto" className={`whitespace-pre-wrap break-words text-lg leading-8 ${reflection.trim() ? "text-slate-200" : "text-slate-500"}`}>
                     {reflection || "Start writing your reflection. Every line and paragraph will stay visible in this preview."}
                   </p>
@@ -875,14 +789,14 @@ Each line can be written on a new line.`}
                   <div className="aspect-square overflow-hidden bg-black/20">
                     <img
                       src={getReflectionImageUrl(item.imageUrl)}
-                      alt={item.title || item.author || "Literary reflection artwork"}
+                      alt="Literary reflection artwork"
                       loading="lazy"
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
                     />
                   </div>
                   <div className="p-3">
                     <p dir="auto" className="truncate text-sm font-semibold text-slate-200">
-                      {item.title || "Untitled reflection"}
+                      Literary reflection
                     </p>
                     <p className="mt-1 text-xs text-slate-500">Select to edit</p>
                   </div>
@@ -931,9 +845,7 @@ Each line can be written on a new line.`}
                               item.imageUrl
                             )}
                             alt={
-                              item.title ||
-                              item.author ||
-                              "Reflection"
+                              "Literary reflection"
                             }
                             className="h-52 w-full rounded-2xl border border-slate-800 bg-slate-950 object-contain"
                           />
@@ -942,32 +854,9 @@ Each line can be written on a new line.`}
 
                       <div className="flex min-w-0 flex-1 flex-col justify-between gap-5 md:flex-row">
                         <div className="min-w-0 flex-1">
-                          {item.title && (
-                            <h3
-                              dir="auto"
-                              className="text-xl font-bold text-white"
-                            >
-                              {
-                                item.title
-                              }
-                            </h3>
-                          )}
-
-                          {item.author && (
-                            <p
-                              dir="auto"
-                              className="mt-2 text-sm font-medium text-violet-300"
-                            >
-                              —{" "}
-                              {
-                                item.author
-                              }
-                            </p>
-                          )}
-
                           <p
                             dir="auto"
-                            className="mt-5 whitespace-pre-line text-lg leading-8 text-slate-300"
+                            className="whitespace-pre-line text-lg leading-8 text-slate-300"
                           >
                             {
                               item.reflection
