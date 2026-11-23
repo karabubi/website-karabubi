@@ -351,9 +351,12 @@ function AdminLiteraryReflections() {
     const normalizedReflection =
       reflection.trim();
 
-    if (!normalizedReflection) {
+    if (
+      !normalizedReflection &&
+      !activeImagePreview
+    ) {
       setError(
-        "Please enter the reflection text."
+        "Please write a reflection or upload an image."
       );
 
       return;
@@ -698,9 +701,15 @@ Each line can be written on a new line.`}
                 <div className="p-6 sm:p-7">
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-violet-300">Literary reflection</p>
                   <div className="mb-5 mt-4 h-px bg-gradient-to-r from-violet-400/40 via-white/10 to-transparent" />
-                  <p dir="auto" className={`whitespace-pre-wrap break-words text-lg leading-8 ${reflection.trim() ? "text-slate-200" : "text-slate-500"}`}>
-                    {reflection || "Start writing your reflection. Every line and paragraph will stay visible in this preview."}
-                  </p>
+                  {reflection.trim() ? (
+                    <p dir="auto" className="whitespace-pre-wrap break-words text-lg leading-8 text-slate-200">
+                      {reflection}
+                    </p>
+                  ) : !activeImagePreview ? (
+                    <p className="text-lg leading-8 text-slate-500">
+                      Write a reflection, upload an image, or use both.
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
@@ -711,7 +720,7 @@ Each line can be written on a new line.`}
                 </div>
                 <div className="rounded-2xl border border-white/[0.07] bg-white/[0.035] p-4">
                   <p className="text-xs uppercase tracking-[0.15em] text-slate-500">Artwork</p>
-                  <p className="mt-1 text-lg font-bold text-white">{activeImagePreview ? "Ready" : "Optional"}</p>
+                  <p className="mt-1 text-lg font-bold text-white">{activeImagePreview ? "Ready" : reflection.trim() ? "Not needed" : "Optional"}</p>
                 </div>
               </div>
             </aside>
